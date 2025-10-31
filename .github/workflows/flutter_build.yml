@@ -1,4 +1,4 @@
-name: Build Android APK - Flutter
+name: Build Android APK - FINAL
 
 on:
   push:
@@ -10,31 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
+          flutter-version: '3.24.3' # or whatever version your project uses
 
-      - name: Verify Source Directory
-        run: |
-          echo "Listing Source folder..."
-          ls -la
-          ls -la Source || echo "⚠️ Source folder not found!"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Get dependencies
+      - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: ./Source
+        working-directory: ./sfsmsgapp/Source
 
-      - name: Build release APK
-        run: flutter build apk --release
-        working-directory: ./Source
+      - name: Build APK (Debug)
+        run: flutter build apk --debug
+        working-directory: ./sfsmsgapp/Source
+
+      - name: Find built APK
+        run: find . -name "*.apk" -type f
+        working-directory: ./sfsmsgapp/Source
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sfsmsgapp-release-apk
-          path: Source/build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
+          name: app-debug-apk
+          path: sfsmsgapp/Source/build/app/outputs/flutter-apk/app-debug.apk
