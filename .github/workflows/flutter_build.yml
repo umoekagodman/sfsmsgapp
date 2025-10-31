@@ -1,0 +1,34 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Flutter Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.0'
+
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: source
+
+      - name: Build APK
+        run: flutter build apk --release
+        working-directory: source
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sfsmsgapp-release-apk
+          path: source/build/app/outputs/flutter-apk/app-release.apk
