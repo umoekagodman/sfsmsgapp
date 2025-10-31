@@ -1,14 +1,12 @@
-name: Build Android APK
+name: Build Android APK - Flutter
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch: # allows manual trigger
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Flutter Android App
     runs-on: ubuntu-latest
 
     steps:
@@ -20,17 +18,23 @@ jobs:
         with:
           flutter-version: '3.10.0'
 
+      - name: Verify Source Directory
+        run: |
+          echo "Listing Source folder..."
+          ls -la
+          ls -la Source || echo "⚠️ Source folder not found!"
+
       - name: Get dependencies
         run: flutter pub get
-        working-directory: /sfsmsgapp/Source
+        working-directory: ./Source
 
       - name: Build release APK
         run: flutter build apk --release
-        working-directory: source
+        working-directory: ./Source
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: sfsmsgapp-release-apk
-          path: sfsmsgapp/Source/build/app/outputs/flutter-apk/app-release.apk
+          path: Source/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
