@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # allows manual trigger
 
 jobs:
   build:
@@ -12,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -23,12 +24,13 @@ jobs:
         run: flutter pub get
         working-directory: source
 
-      - name: Build APK
+      - name: Build release APK
         run: flutter build apk --release
         working-directory: source
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
         with:
           name: sfsmsgapp-release-apk
           path: source/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
