@@ -16,7 +16,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.0' 
+          flutter-version: '3.29.0'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -24,18 +24,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # 🧹 Ensure a clean build environment
+      - name: Clean project
+        run: flutter clean
+        working-directory: ./sfsmsgapp/Source
+
+      # 🧠 Regenerate dependencies cleanly
       - name: Get Flutter dependencies
         run: flutter pub get
         working-directory: ./sfsmsgapp/Source
 
+      # 🏗️ Build debug APK
       - name: Build APK (Debug)
         run: flutter build apk --debug
         working-directory: ./sfsmsgapp/Source
 
+      # 🔍 Find and list APKs
       - name: Find built APK
         run: find . -name "*.apk" -type f
         working-directory: ./sfsmsgapp/Source
 
+      # 📦 Upload APK artifact to GitHub Actions
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
