@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+    <link href="assets/images/favicon.png" rel="icon" />
+    <title>Sngine Messaging Apps - Documentation</title>
+    <meta name="description" content="Sngine Messaging Apps Documentation">
+    <meta name="author" content="Zamblek">
+
+    <!-- Stylesheet ============================== -->
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome Icon -->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/font-awesome/css/all.min.css" />
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/magnific-popup/magnific-popup.min.css" />
+    <!-- Highlight Syntax -->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/highlight.js/styles/github.css" />
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" type="text/css" href="assets/css/stylesheet.css" />
+  </head>
+
+  <body data-spy="scroll" data-target=".idocs-navigation" data-offset="125">
+
+    <!-- Preloader -->
+    <div class="preloader">
+      <div class="lds-ellipsis">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <!-- Preloader End -->
+
+    <!-- Document Wrapper ============================== -->
+    <div id="main-wrapper">
+
+      <!-- Header ============================== -->
+      <header id="header" class="sticky-top">
+        <!-- Navbar -->
+        <nav class="primary-menu navbar navbar-expand-lg navbar-dropdown-dark">
+          <div class="container-fluid">
+            <!-- Sidebar Toggler -->
+            <button id="sidebarCollapse" class="navbar-toggler d-block d-md-none" type="button"><span></span><span class="w-75"></span><span class="w-50"></span></button>
+
+            <!-- Logo -->
+            <a class="logo ml-md-3" href="index.html" title="Sngine Documentation"> <img src="assets/images/logo.png" alt="Sngine Documentation" height="50px" /> </a>
+            <span class="text-2 ml-2">v1.0</span>
+            <!-- Logo End -->
+
+            <!-- Navbar Toggler -->
+            <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#header-nav"><span></span><span></span><span></span></button>
+
+            <div id="header-nav" class="collapse navbar-collapse justify-content-end">
+              <ul class="navbar-nav">
+                <li><a target="_blank" href="https://api.sngine.com">APIs Docs</a></li>
+                <li><a target="_blank" href="https://zamblek.com/support">Support</a></li>
+                <li>
+                  <a class="btn btn-primary" style="margin-top: 12px;" target="_blank" href="https://bit.ly/BuySngine"><strong>Buy Sngine</strong></a>
+                </li>
+              </ul>
+            </div>
+            <ul class="social-icons social-icons-sm ml-lg-2 mr-2">
+              <li class="social-icons-twitter"><a data-toggle="tooltip" href="https://x.com/ZamblekTech" target="_blank" title="" data-original-title="Twitter"><i class="fab fa-twitter"></i></a></li>
+              <li class="social-icons-facebook"><a data-toggle="tooltip" href="https://www.facebook.com/Zamblek" target="_blank" title="" data-original-title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+              <li class="social-icons-youtube"><a data-toggle="tooltip" href="https://www.youtube.com/@ZamblekTech" target="_blank" title="" data-original-title="YouTube"><i class="fab fa-youtube"></i></a></li>
+              <li class="social-icons-github"><a data-toggle="tooltip" href="https://github.com/ZamblekTech" target="_blank" title="" data-original-title="GitHub"><i class="fab fa-github"></i></a></li>
+            </ul>
+          </div>
+        </nav>
+        <!-- Navbar End -->
+      </header>
+      <!-- Header End -->
+
+      <!-- Content ============================== -->
+      <div id="content" role="main">
+
+        <!-- Sidebar Navigation ============================== -->
+        <div class="idocs-navigation bg-light">
+          <ul class="nav flex-column ">
+
+            <li class="nav-item"><a class="nav-link active" href="#Getting-Started">Getting Started</a>
+              <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#File-Structure">File Structure</a></li>
+                <li class="nav-item"><a class="nav-link" href="#Prerequisites">Prerequisites</a></li>
+              </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#Installation">Installation</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="#Configuration">Configuration</a>
+              <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#APIs-Settings">APIs Settings</a></li>
+                <li class="nav-item"><a class="nav-link" href="#Push-Notifications">Push Notifications</a></li>
+                <li class="nav-item"><a class="nav-link" href="#App-Configuration">App Configuration</a></li>
+              </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#Running-The-Apps">Running The Apps</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="#Customization">Customization</a>
+              <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#App-Name">App Name</a></li>
+                <li class="nav-item"><a class="nav-link" href="#App-Icon">App Icon</a></li>
+                <li class="nav-item"><a class="nav-link" href="#App-Colors">App Colors</a></li>
+                <li class="nav-item"><a class="nav-link" href="#App-Images">App Images</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#Building-The-Apps">Building The Apps</a>
+              <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#Android-App">Building Android App</a></li>
+                <li class="nav-item"><a class="nav-link" href="#iOS-App">Building iOS App</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#FAQs">FAQ</a>
+              <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#General-FAQs">General</a></li>
+              </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#Support">Support</a></li>
+            <li class="nav-item"><a class="nav-link" href="#Changelog">Changelog</a>
+              <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#v1-0">v1.0</a></li>
+              </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#More-Items">More Items</a></li>
+          </ul>
+        </div>
+
+        <!-- Docs Content ============================ -->
+        <div class="idocs-content">
+          <div class="container">
+
+            <!-- Getting Started ============================ -->
+            <section id="Getting-Started">
+              <h1>Documentation</h1>
+              <h2>Sngine Messaging Apps for Android & iOS</h2>
+              <p class="lead">
+
+              </p>
+              <p class="lead">
+                This documentation will guide you through the setup, customization, and publishing process of the Flutter apps for both Android and iOS platforms for Sngine Messaging Apps.
+              </p>
+              <hr>
+              <div class="row">
+                <div class="col-sm-6 col-lg-4">
+                  <ul class="list-unstyled">
+                    <li><strong>Version:</strong> 1.0</li>
+                    <li><strong>Author:</strong> <a href="https://codecanyon.net/user/zamblek/portfolio" target="_blank">Zamblek</a></li>
+                  </ul>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                  <ul class="list-unstyled">
+                    <li><strong>Created:</strong> May 2025</li>
+                    <li><strong>Updated:</strong> May 2025</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="alert alert-info">
+                If you have any questions that are beyond the scope of this documentation, Please feel free to contact us via <a target="_blank" href="https://zamblek.com/support">Support Center</a>
+              </div>
+              <div class="alert alert-success">
+                If you don't have enough experience with Mobile App Development, We offer such service as freelance work, for more info please contact us via <a href="https://codecanyon.net/user/zamblek#contact" target="_blank">Contact Form</a>
+              </div>
+              <div class="alert alert-warning">
+                ⚠️ You must have <a href="https://bit.ly/BuySngine" target="_blank">Sngine PHP Social Network Platform</a> v4.0 or higher installed on your server to build the apps
+              </div>
+            </section>
+
+            <hr class="divider">
+
+            <!-- File Structure =========================== -->
+            <section class="docs-section" id="File-Structure">
+              <h2>File Structure</h2>
+              <p>
+                After downloading the Sngine Messaging Apps zip file from CodeCanyon and extracting it, you will need the <code>Source</code> folder to build the apps.
+              </p>
+              <p>
+                The file structure of the source code inside this folder <code>Source</code> is as follows:
+              </p>
+              <pre style="padding: 30px; background: #f3f3f3; border-radius: 18px;">
+/android
+/ios
+/assets/ # App assets (images, icons, etc.)
+/lib/
+  └── common/
+      └── config.dart # Main configuration file
+      └── themes.dart # App theming
+  └── routes/
+  └── screens/ # All screens
+  └── states/
+  └── utilities/
+  └── widgets/
+  └── main.dart # Main file
+/pubspec.yaml
+              </pre>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Prerequisites =========================== -->
+            <section class="docs-section" id="Prerequisites">
+              <h2>Prerequisites</h2>
+              <div class="alert alert-success">
+                <ul>
+                  <li><strong>Sngine:</strong> Version 4.0 or higher</li>
+                  <li><strong>Flutter SDK:</strong> Version 3.10.0 or higher</li>
+                  <li><strong>Visual Studio Code</strong> with <code>Flutter & Dart</code> plugins (for app configuration & customization)</li>
+                  <li><strong>Android Studio</strong> (for building Android app)</li>
+                  <li><strong>Xcode</strong> (for building iOS app)</li>
+                  <li><strong>OneSignal Account</strong> (for push notifications)</li>
+                </ul>
+
+              </div>
+              <div class="alert alert-info">
+                We will use Visual Studio Code during the documentation then will use Android Studio & Xcode for building the apps.
+              </div>
+              <div class="alert alert-warning">
+                ⚠️ You can't build the iOS app if you don't have a Mac computer.
+              </div>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Installation =========================== -->
+            <section class="docs-section" id="Installation">
+              <h2>Installation</h2>
+              <p>
+                Before you start, you need to install Android Studio (For Android) and Xcode (For iOS) and Flutter then set up your development environment.
+              </p>
+              <h5>Sngine Installation</h5>
+              <p>
+                You can follow the Sngine installation guide from here <a href="https://docs.sngine.com/" target="_blank">Sngine Installation Guide</a>
+              </p>
+              <h5>Visual Studio Code Installation</h5>
+              <p>
+                You can download Visual Studio Code from here <a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a>
+              </p>
+              <p>
+                You can insall Flutter & Dart plugins from here <a href="https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter" target="_blank">Flutter & Dart Plugins</a>
+              </p>
+              <h5>Flutter Installation</h5>
+              <p>
+                You can follow the Flutter installation guide from here <a href="https://flutter.dev/docs/get-started/install" target="_blank">Flutter Installation Guide</a>
+              </p>
+              <h5>Android Studio Installation</h5>
+              <p>
+                You can download Android Studio from here <a href="https://developer.android.com/studio" target="_blank">Android Studio</a>
+              </p>
+              <p>
+                You can insall Flutter & Dart plugins from here <a href="https://plugins.jetbrains.com/plugin/9212-flutter" target="_blank">Flutter & Dart Plugins</a>
+              </p>
+              <h5>Xcode Installation <span class="badge bg-light text-primary">MacOS</span></h5>
+              <p>
+                You can download Xcode from here <a href="https://developer.apple.com/xcode/" target="_blank">Xcode</a>
+              </p>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Configuration =========================== -->
+            <section class="docs-section" id="Configuration">
+              <h2>Configuration</h2>
+              <p>
+                In this section, we will guide you through the configuration of the apps like <span class="initialism">APIs Settings</span>, <span class="initialism">Push Notifications</span>, and <span class="initialism">App Configuration</span>.
+              </p>
+            </section>
+
+            <hr class="divider">
+
+            <!-- APIs Settings =========================== -->
+            <section class="docs-section" id="APIs-Settings">
+              <h2>APIs Settings</h2>
+              <p>
+                First thing you need to make sure you are ruuning Sngine latest version (v4.0 or higher) and now you need to configure your API settings.
+              </p>
+              <div class="alert alert-warning">
+                ⚠️ Resetting the APIs Keys after building the apps will generate new keys and you need to update and republish the apps again.
+              </div>
+              <ol>
+                <li>
+                  <p>
+                    Go to your Sngine admin panel then <span class="initialism">APIs Settings</span>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/API-01.png">
+                      <img src="assets/screenshots/API-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    If you don't the keys generated, you can generate them from here <span class="initialism">Reser API Key</span> and the same for JWT Key for <span class="initialism">Reset JWT Key</span>
+                  </p>
+                  <p>
+                    Then your need to check if it's working fine by clicking on <span class="initialism">Ping API</span> button till you see the success message like this:
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/API-02.png">
+                      <img src="assets/screenshots/API-02.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now you need to copy the <span class="initialism">API Key</span>, <span class="initialism">API Secret</span> and <span class="initialism">JWT Key</span> and paste it in the apps <code>config.dart</code> file as will be shown shortly.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Push Notifications =========================== -->
+            <section class="docs-section" id="Push-Notifications">
+              <h2>Push Notifications</h2>
+              <p>
+                In this section, we will guide you through the configuration of the push notifications for the apps.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    First of all you need to configure the push notifications in your Sngine admin panel for the messging apps as we shown in the Sngine documentation <a href="https://docs.sngine.com/#Messaging-Apps-Notifications" target="_blank">Push Notifications Setup</a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/OneSignal-01.png">
+                      <img src="assets/screenshots/OneSignal-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now you need to copy the <span class="initialism">OneSignal App ID</span> and paste it in the apps <code>config.dart</code> file as will be shown shortly.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- App Configuration =========================== -->
+            <section class="docs-section" id="App-Configuration">
+              <h2>App Configuration</h2>
+              <p>
+                In this section, we will guide you through the configuration of the app.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    After open the source code folder then go to <code>lib/common/config.dart</code> file and you will see the configuration file as will be shown in the screenshot below:
+                  </p>
+                  <p>
+                    You will paste the API Key, API Secret and OneSignal App ID in the <code>config.dart</code> file as will be shown in the screenshot below:
+                  </p>
+                  <p>
+                    For <span class="initialism">apiURL</span> it will be the URL of your Sngine server like <code>https://demo.sngine.com</code> without the <code>/</code> at the end
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Config-01.png">
+                      <img src="assets/screenshots/Config-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now you need to run the following command to install the app dependencies.
+                  </p>
+                  <p>
+                    <code>flutter pub get</code>
+                  </p>
+                  <p>
+                    You can also open the <code>pubspec.yaml</code> and click on <span class="initialism">Get Packages</span> button to install the dependencies.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Pubspec-01.png">
+                      <img src="assets/screenshots/Pubspec-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Pubspec-02.png">
+                      <img src="assets/screenshots/Pubspec-02.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    And that's it, you have successfully configured the app. Now you can customize the app as you want.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Running The Apps =========================== -->
+            <section class="docs-section" id="Running-The-Apps">
+              <h2>Running The Apps</h2>
+              <p>
+                In this section, you will learn how to run the apps on your device.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    You need to run the app to make sure it's working fine and connected to your Sngine server using the API keys you configured in the previous sections.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    From Visual Studio Code, you can run the app on your device by clicking on the <span class="initialism">Run</span> button after open <code>lib/main.dart</code> file then select your device from the list.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Run-01.png">
+                      <img src="assets/screenshots/Run-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Run-02.png">
+                      <img src="assets/screenshots/Run-02.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    This step will take a while to build the app and then you will see the app running on your device.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Run-03.png">
+                      <img src="assets/screenshots/Run-03.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Run-04.png">
+                      <img src="assets/screenshots/Run-04.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Run-05.png">
+                      <img src="assets/screenshots/Run-05.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now you can see the app running on your device and you ready to customize the app as you want.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Customization =========================== -->
+            <section class="docs-section" id="Customization">
+              <h2>Customization</h2>
+              <p>
+                In this section, we will guide you through the customization of the app like <span class="initialism">App Name</span>, <span class="initialism">App Icon</span>, and <span class="initialism">App Colors</span>.
+              </p>
+            </section>
+
+            <hr class="divider">
+
+            <!-- App Name =========================== -->
+            <section class="docs-section" id="App-Name">
+              <h2>App Name</h2>
+              <p>
+                In this section, we will guide you through the customization of the app name.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    You can change the app name from 2 files <code>android/app/src/main/AndroidManifest.xml</code> and <code>ios/Runner.xcworkspace/Runner.xcproj</code>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/App-Name-01.png">
+                      <img src="assets/screenshots/App-Name-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- App Icon =========================== -->
+            <section class="docs-section" id="App-Icon">
+              <h2>App Icon</h2>
+              <p>
+                In this section, we will guide you through the customization of the app icon.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    First you will need to have your app icon as <code>JPG</code> or <code>PNG</code> file with the size of <code>1024x1024</code> pixels.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    You will use this online tool to generate the app icon for Android and iOS <a href="https://www.appicon.co/" target="_blank">https://www.appicon.co/</a> You will drag and drop your app icon to the tool and then you will click on the <span class="initialism">Generate</span> button.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/App-Icon-01.png">
+                      <img src="assets/screenshots/App-Icon-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    You will get a <code>ZIP</code> file with the app icon for Android and iOS.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/App-Icon-02.png">
+                      <img src="assets/screenshots/App-Icon-02.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    For Android, you will need to copy/paste what's inside the <code>Android</code> folder to <code>android/app/src/main/res</code> folder.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    For iOS, you will need to copy/paste the followings files <code>appstore.png</code>, <code>playstore.png</code> and <code>Assets.xcassets</code> folder to <code>ios/Runner</code> folder.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    And that's it, you have successfully changed the app icon.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- App Colors =========================== -->
+            <section class="docs-section" id="App-Colors">
+              <h2>App Colors</h2>
+              <p>
+                In this section, we will guide you through the customization of the app colors.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    You can change the app colors from <code>lib/common/themes.dart</code> file.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/App-Colors-01.png">
+                      <img src="assets/screenshots/App-Colors-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- App Images =========================== -->
+            <section class="docs-section" id="App-Images">
+              <h2>App Images</h2>
+              <p>
+                In this section, we will guide you through the customization of the app images.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    You can change the app images from <code>assets/images</code> folder.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/App-Images-01.png">
+                      <img src="assets/screenshots/App-Images-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    The image you want to change must be with same name and extension as the original image.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Building The Apps =========================== -->
+            <section class="docs-section" id="Building-The-Apps">
+              <h2>Building The Apps</h2>
+              <p>
+                In this section, we will guide you through the building of the apps for Android and iOS.
+              </p>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Building Android App =========================== -->
+            <section class="docs-section" id="Android-App">
+              <h2>Building Android App</h2>
+              <p>
+                In this section, we will guide you through the building of the Android app.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    First you will need to change your app bundle ID to a unique one in the following files:
+                  </p>
+                  <p>
+                    <code>android/app/build.gradle.kts</code>
+                  </p>
+                  <p>
+                    <code>android/app/src/main/kotlin/com/example/sngine_messenger/MainActivity.kt</code>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-Android-01.png">
+                      <img src="assets/screenshots/Building-Android-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Select the Android folder from your source code folder and open it in Android Studio.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Once the Android Studio is open let the Gradle build the app.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-Android-02.png">
+                      <img src="assets/screenshots/Building-Android-02.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Once the Gradle build is finished, you can select from the menu <span class="initialism">Build</span> > <span class="initialism">Generate Signed Bundle / APK...</span>.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-Android-03.png">
+                      <img src="assets/screenshots/Building-Android-03.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-Android-04.png">
+                      <img src="assets/screenshots/Building-Android-04.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                  <p>
+                    You will need to generate the keystore file and then you will select the <span class="initialism">AAB</span> option.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-Android-05.png">
+                      <img src="assets/screenshots/Building-Android-05.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    You will see the <code>AAB</code> file in the folder you selected to save the file.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Building iOS App =========================== -->
+            <section class="docs-section" id="iOS-App">
+              <h2>Building iOS App</h2>
+              <p>
+                In this section, we will guide you through the building of the iOS app.
+              </p>
+              <ol>
+                <li>
+                  <p>
+                    First you need to create a new Apple Developer Account if you don't have one yet <a href="https://developer.apple.com/account/" target="_blank">https://developer.apple.com/account/</a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    You need to create a new App ID if you don't have one yet <a href="https://developer.apple.com/account/resources/identifiers/list" target="_blank">https://developer.apple.com/account/resources/identifiers/list</a>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-IOS-01.png">
+                      <img src="assets/screenshots/Building-IOS-01.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Open the <code>ios/Runner.xcworkspace</code> file in Xcode and wait for the project to be indexed and ready.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-IOS-02.png">
+                      <img src="assets/screenshots/Building-IOS-02.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Select the <span class="initialism">Runner</span> project from the left sidebar and click on the <span class="initialism">Runner</span> target.
+                  </p>
+                  <p>
+                    Change the <span class="initialism">Team</span> to your Apple Developer Team. Also change the <span class="initialism">Bundle Identifier</span> to the one you created in the previous step.
+                  </p>
+                  <p>
+                    In App Groups section, you need to add a new App Group like <code>group.YOUR_APP_BUNDLE.onesignal</code>
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-IOS-03.png">
+                      <img src="assets/screenshots/Building-IOS-03.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now change the target to <span class="initialism">OneSignalNotificationServiceExtension</span> and change the <span class="initialism">Team</span> to your Apple Developer Team.
+                  </p>
+                  <p>
+                    You need to change the <span class="initialism">Bundle Identifier</span> to <code>YOUR_APP_BUNDLE.OneSignalNotificationServiceExtension</code>.
+                  </p>
+                  <p>
+                    In App Groups section, you need to add the same App Group as the main app <code>group.YOUR_APP_BUNDLE.onesignal</code>.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-IOS-04.png">
+                      <img src="assets/screenshots/Building-IOS-04.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now you can publish the app by selecting from the menu <span class="initialism">Product</span> > <span class="initialism">Archive</span>.
+                  </p>
+                  <p>
+                    <a class="popup-img" href="assets/screenshots/Building-IOS-05.png">
+                      <img src="assets/screenshots/Building-IOS-05.png" class="img-fluid img-thumbnail" alt="image">
+                    </a>
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    Now you can select the <span class="initialism">Distribute</span> option and then select the <span class="initialism">App Store Connect</span> option.
+                  </p>
+                </li>
+                <li>
+                  <p>
+                    You will follow the steps to upload the app to App Store Connect.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <hr class="divider">
+
+            <!-- FAQ =========================== -->
+            <section class="docs-article" id="FAQs">
+              <h2>FAQ</h2>
+              <p>
+                Explore answers for the frequently asked questions related to how to install and run Sngine.
+              </p>
+            </section>
+
+            <hr class="divider">
+
+            <!-- General FAQ ============================== -->
+            <section id="General-FAQs">
+              <h2>General</h2>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="accordion accordion-alterate arrow-right" id="GeneralFAQ">
+                    <div class="card">
+                      <div class="card-header" id="heading1">
+                        <h5 class="mb-0">
+                          <a href="#" class="collapsed" data-toggle="collapse" data-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                            What is the technology used in Sngine Messaging Apps?
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="collapse1" class="collapse" aria-labelledby="heading1" data-parent="#GeneralFAQ">
+                        <div class="card-body">
+                          We use Flutter for building the apps.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card">
+                      <div class="card-header" id="heading4">
+                        <h5 class="mb-0">
+                          <a href="#" class="collapsed" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                            Can I use the source code for multiple apps?
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="collapse4" class="collapse" aria-labelledby="heading4" data-parent="#GeneralFAQ">
+                        <div class="card-body">
+                          No, You can't use the source code for multiple apps. You need to buy a new license for each app. One license is for the Android app and the iOS app for one project only.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-header" id="heading5">
+                        <h5 class="mb-0">
+                          <a href="#" class="collapsed" data-toggle="collapse" data-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                            When is the next update coming up? What are the new features?
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="collapse5" class="collapse" aria-labelledby="heading5" data-parent="#GeneralFAQ">
+                        <div class="card-body">
+                          When we have something to announce we will announce about as usual also there is no specified date for every new update, We really encourage you to join Sngine group on Facebook to see more discussion about what's coming next:
+                          <br>
+                          <a target="_blank" href="https://www.facebook.com/groups/sngine">https://www.facebook.com/groups/sngine</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-header" id="heading6">
+                        <h5 class="mb-0">
+                          <a href="#" class="collapsed" data-toggle="collapse" data-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                            Can support team install/update Sngine or Build the apps for me?
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="collapse6" class="collapse" aria-labelledby="heading6" data-parent="#GeneralFAQ">
+                        <div class="card-body">
+                          No support not include any customization or installation service for building apps for your, you can check our <a target="_blank" href="https://sngine.com/docs/installation/installation-guide">Installation Guide</a> to install Sngine on your own.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-header" id="heading7">
+                        <h5 class="mb-0">
+                          <a href="#" class="collapsed" data-toggle="collapse" data-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+                            Can support team install/update Sngine as freelance work?
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="collapse7" class="collapse" aria-labelledby="heading7" data-parent="#GeneralFAQ">
+                        <div class="card-body">
+                          Yes we provide installation and update service as a freelance work, For any Freelance work you can contact our development team from the contact form:
+                          <br>
+                          <a target="_blank" href="https://codecanyon.net/user/zamblek#contact">https://codecanyon.net/user/zamblek#contact</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Support ============================== -->
+            <section id="Support">
+              <h2>Support</h2>
+              <p>If you have any questions that are beyond the scope of this documentation, Please feel free to contact us via <a class="btn btn-primary" target="_blank" href="https://zamblek.com/support/">Support Center</a></p>
+              <p> We are located in GMT +2:00 time zone and we answer all questions within 12-24 hours in weekdays. In some rare cases the waiting time can be to 48 hours. (except holiday seasons which might take longer).</p>
+              <div class="alert alert-warning mb-4"><span class="badge badge-danger text-uppercase">Note:</span> While we aim to provide the best support possible, please keep in mind that it only extends to verified buyers and only to issues related to our template like bugs and errors. Custom modifications or third party module implementations are not included.</div>
+              <h4>Don't forget to Rate Sngine
+                <i class="fas fa-star text-warning"></i> <i class="fas fa-star text-warning"></i> <i class="fas fa-star text-warning"></i> <i class="fas fa-star text-warning"></i> <i class="fas fa-star text-warning"></i>
+              </h4>
+              <div class="alert alert-success">
+                Please Add your Review (Opinion) for Our template. It would be a great support for us.<br>
+                Go to your <strong>CodeCanyon Profile</strong> > <strong>Downloads Tab</strong> > & then You can Rate & Review for our script.<br>
+                Thank You.
+              </div>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Changelog ============================== -->
+            <section id="Changelog">
+              <h2>Changelog</h2>
+              <p class="text-4">See what's new added, changed, fixed, improved or updated in the latest versions. </p>
+              <div class="alert alert-info mb-5">
+                To see more discussion about what's coming next <a target="_blank" href="https://www.facebook.com/groups/sngine">Sngine Facebook Group</a>
+              </div>
+
+              <h3 id="v2-0">Version 1.0 <small class="text-muted">(20-05-2025)</small></h3>
+              <ul class="changelog">
+                <li><span class="badge badge-primary">initial</span> Initial Release</li>
+              </ul>
+            </section>
+
+            <hr class="divider">
+
+            <!-- Our Portfolio ============================== -->
+            <section id="More-Items">
+              <h2>More Items</h2>
+              <div class="row">
+                <div class="col-4 my-3 text-center">
+                  <a target="_blank" href="https://bit.ly/BuySngine"><img class="img-fluid border" src="assets/images/items/sngine.jpg" alt="">
+                    <h6 class="pt-2">Sngine - The Ultimate PHP Social Network Platform</h6>
+                  </a>
+                </div>
+                <div class="col-4 my-3 text-center">
+                  <a target="_blank" href="https://bit.ly/BuySngine"><img class="img-fluid border" src="assets/images/items/sngine-messaging.jpg" alt="">
+                    <h6 class="pt-2">Sngine Messaging Apps for Android & iOS</h6>
+                  </a>
+                </div>
+              </div>
+              <p class="text-center"><a class="btn btn-lg btn-primary my-4" target="_blank" href="https://codecanyon.net/user/zamblek/portfolio">Our Portfolio</a></p>
+            </section>
+
+          </div>
+        </div>
+
+      </div>
+      <!-- Content end -->
+
+      <!-- Footer ============================ -->
+      <footer id="footer" class="section bg-dark footer-text-light">
+        <div class="container">
+          <ul class="social-icons social-icons-lg social-icons-muted justify-content-center mb-3">
+            <li><a data-toggle="tooltip" href="https://x.com/ZamblekTech" target="_blank" title="" data-original-title="Twitter"><i class="fab fa-twitter"></i></a></li>
+            <li><a data-toggle="tooltip" href="https://www.facebook.com/Zamblek" target="_blank" title="" data-original-title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a data-toggle="tooltip" href="https://www.youtube.com/@ZamblekTech" target="_blank" title="" data-original-title="YouTube"><i class="fab fa-youtube"></i></a></li>
+            <li><a data-toggle="tooltip" href="https://github.com/ZamblekTech" target="_blank" title="" data-original-title="GitHub"><i class="fab fa-github"></i></a></li>
+          </ul>
+          <p class="text-center">Copyright &copy; 2025 <a href="https://sngine.com/">Sngine</a>. All Rights Reserved.</p>
+          <p class="text-2 text-center mb-0">Developed by <a class="btn-link" target="_blank" href="https://zamblek.com/">Zamblek</a>.</p>
+        </div>
+      </footer>
+      <!-- Footer end -->
+
+    </div>
+    <!-- Document Wrapper end -->
+
+    <!-- Back To Top -->
+    <a id="back-to-top" data-toggle="tooltip" title="Back to Top" href="javascript:void(0)"><i class="fa fa-chevron-up"></i></a>
+
+    <!-- JavaScript ============================ -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Highlight JS -->
+    <script src="assets/vendor/highlight.js/highlight.min.js"></script>
+    <!-- Easing -->
+    <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <!-- Magnific Popup -->
+    <script src="assets/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+    <!-- Custom Script -->
+    <script src="assets/js/theme.js"></script>
+  </body>
+
+</html>

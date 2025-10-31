@@ -1,0 +1,208 @@
+{
+ "Oops!": "عفوا!",
+ "Something went wrong!": "هناك خطأ ما!",
+ "Failed to load system settings": "فشل في تحميل إعدادات النظام",
+ "There is something that went wrong!": "هناك خطأ ما!",
+ "Cancel": "إلغاء",
+ "Continue": "متابعه",
+ "No data to show": "لا توجد بيانات للعرض",
+ "Select Language": "اختر اللغة",
+ "Microphone permission not granted": "لم يتم السماح بالميكروفون",
+ "Failed to start recording": "فشل في بدء التسجيل",
+ "Failed to stop recording": "فشل في إيقاف التسجيل",
+ "Saved": "تم الحفظ",
+
+ "Chat with friends": "الدردشة مع الأصدقاء",
+ "Welcome to our messaging app, chat with your friends and family and stay connected": "مرحبًا بك في تطبيق الرسائل الخاص بنا، ادردش مع أصدقائك وعائلتك وابق على اتصال",
+ "Start Chatting": "ابدأ الدردشة",
+
+ "Sign In": "تسجيل الدخول",
+ "Sign In to your Account": "تسجيل الدخول إلى حسابك",
+ "Welcome back! please enter your details": "مرحبا بك مرة أخرى! الرجاء إدخال تفاصيلك",
+ "Or": "أو",
+ "Sign in with Facebook": "تسجيل الدخول باستخدام الفيسبوك",
+ "Sign in with Google": "تسجيل الدخول باستخدام جوجل",
+ "Sign in with X": "تسجيل الدخول باستخدام إكس",
+ "Sign in with LinkedIn": "تسجيل الدخول باستخدام لينكد إن",
+ "Sign in with VK": "تسجيل الدخول باستخدام VK",
+ "Sign in with WordPress": "تسجيل الدخول باستخدام ووردبريس",
+ "Don't have an account?": "ليس لديك حساب؟",
+ "Sign Up!": "سجل!",
+ "Email or Username": "البريد الإلكتروني أو اسم المستخدم",
+ "Enter valid email or username": "أدخل بريد إلكتروني صالح أو اسم مستخدم",
+ "Password": "كلمه السر",
+ "Enter valid password": "أدخل كلمة مرور صالحة",
+ "Forgotten password?": "نسيت كلمة المرور؟",
+
+ "Forget Password": "نسيت كلمة المرور",
+ "Forgot your password?": "هل نسيت كلمة المرور؟",
+ "Enter the email address associated with your account and we will send you a link to reset your password": "أدخل عنوان البريد الإلكتروني المرتبط بحسابك وسنرسل لك رابطًا لإعادة تعيين كلمة المرور الخاصة بك",
+ "Need help?": "تحتاج مساعدة؟",
+
+ "Contact Us!": "اتصل بنا!",
+ "Email": "البريد الإلكتروني",
+ "Enter valid email": "أدخل بريد إلكتروني صالح",
+ "Send": "إرسال",
+ "Contact Us": "اتصل بنا",
+ "Contact us and we will contact you back": "اتصل بنا وسنتصل بك مرة أخرى",
+ "Name": "اسم",
+ "Enter valid name": "أدخل اسم صالح",
+ "Subject": "موضوع",
+ "Enter valid subject": "أدخل موضوع صالح",
+ "Message": "رسالة",
+ "Enter valid message": "أدخل رسالة صالحة",
+
+ "Verification Code": "رمز التحقق",
+ "We sent you an email with a six-digit verification code. Enter it below to continue to reset your password": "لقد أرسلنا لك بريدًا إلكترونيًا برمز تحقق مكون من ستة أرقام. أدخله أدناه للمتابعة لإعادة تعيين كلمة المرور الخاصة بك",
+ "Enter valid code": "أدخل رمز صالح",
+ "Change Your Password": "غير كلمة المرور الخاصة بك!",
+ "New Password": "كلمة السر الجديدة",
+ "Confirm Password": "تأكيد كلمة المرور",
+
+ "Sign Up": "سجل",
+ "Create a new account": "إنشاء حساب جديد",
+ "Invitation Code": "رمز الدعوة",
+ "Enter valid invitation code": "أدخل رمز دعوة صالح",
+ "First Name": "الاسم الاول",
+ "Enter valid first name": "أدخل اسم صالح",
+ "Last Name": "الاسم الاخير",
+ "Enter valid last name": "أدخل اسم صالح",
+ "Username": "اسم المستخدم",
+ "Enter your username": "أدخل اسم المستخدم الخاص بك",
+ "Enter valid username": "أدخل اسم مستخدم صالح",
+ "Phone Number (e.g +1234567890)": "رقم الهاتف (مثال +1234567890)",
+ "Enter valid phone": "أدخل هاتف صالح",
+ "Gender": "جنس",
+ "Select valid gender": "حدد جنس صالح",
+ "Birthdate": "تاريخ الميلاد",
+ "Enter valid birthdate": "أدخل تاريخ ميلاد صالح",
+ "User Group": "مجموعة المستخدمين",
+ "Select valid user group": "حدد مجموعة مستخدمين صالحة",
+ "Enter valid customField": "أدخل {} صالح",
+ "I expressly agree to receive the newsletter": "أوافق بصراحة على استلام النشرة الإخبارية",
+ "By creating your account, you agree to our": "بإنشاء حسابك، فإنك توافق على",
+ "Terms and Conditions": "الشروط والأحكام",
+ "and": "و",
+ "Privacy Policy": "سياسة الخصوصية",
+
+ "Activation Required": "التفعيل مطلوب",
+ "Hey 👋 Let's verify your email": "مرحبا 👋 دعنا نتحقق من بريدك الالكتروني",
+ "Hey 👋 Let's verify your phone": "مرحبا 👋 دعنا نتحقق من رقم هاتفك",
+ "Enter the activation code send to": "أدخل رمز التفعيل المرسل إلى",
+ "to activate your account": "لتفعيل حسابك",
+ "Enter valid activation code": "أدخل رمز التفعيل صالح",
+ "Account activated successfully": "تم تفعيل الحساب بنجاح",
+ "Change Email": "تغيير البريد الإلكتروني",
+ "Change Phone": "تغيير الهاتف",
+ "Sending ...": "إرسال ...",
+ "Activation code sent successfully": "تم إرسال رمز التفعيل بنجاح",
+ "Resend Code": "إعادة إرسال الرمز",
+ "Current": "الحالي",
+ "New Email": "البريد الإلكتروني الجديد",
+ "New Phone": "الهاتف الجديد",
+ "Your email has been changed": "تم تغيير بريدك الإلكتروني",
+ "Your phone has been changed": "تم تغيير هاتفك",
+
+ "2FA Authentication": "المصادقه الثنائيه",
+ "Enter the 6-digit code that you received on your": "أدخل الرمز المكون من 6 أرقام الذي تلقيته على",
+ "Phone": "الهاتف",
+ "Enter valid 2FA code": "أدخل رمز المصادقه الثنائيه صالح",
+
+ "Pending Approval": "في انتظار الموافقة",
+ "Your account is pending approval": "حسابك في انتظار الموافقة",
+ "Your account is pending approval. You will receive a notification once your account is approved": "حسابك في انتظار الموافقة. ستتلقى إشعارًا بمجرد الموافقة على حسابك",
+
+ "Getting Started": "البدء",
+ "Next": "التالى",
+ "Back": "الى الخلف",
+ "Finish": "انهاء",
+ "Upload your photo": "قم بتحميل صورتك",
+ "Welcome": "أهلا بك",
+ "Let's start with your photo": "دعونا نبدأ بصورتك",
+ "Camera": "الكاميرا",
+ "Gallery": "المعرض",
+ "Remove": "إزالة",
+ "Update your info": "تحديث معلوماتك",
+
+ "Location": "موقعك",
+ "Country": "البلد",
+ "Select valid country": "حدد بلد صالح",
+ "Current City": "المدينة الحالية",
+ "Enter your current city": "الرجاء إدخال مدينتك الحالية",
+ "Hometown": "المدينة الأصلية",
+ "Enter your hometown": "الرجاء إدخال مدينتك الأصلية",
+
+ "Work": "العمل",
+ "Work Title": "عنوان العمل",
+ "Enter your work title": "الرجاء إدخال عنوان عملك",
+ "Work Place": "مكان العمل",
+ "Enter your work place": "الرجاء إدخال مكان عملك",
+ "Work Website": "موقع العمل",
+ "Enter your work website": "الرجاء إدخال موقع عملك",
+
+ "Education": "التعليم",
+ "Education Major": "تخصص التعليم",
+ "Enter your education major": "الرجاء إدخال تخصصك التعليمي",
+ "Education School": "مدرسة التعليم",
+ "Enter your education school": "الرجاء إدخال مدرستك التعليمية",
+ "Education Class": "صفك التعليم",
+ "Enter your education class": "الرجاء ادخال صفك التعليمي",
+
+ "Manage Connections": "إدارة الاتصالات",
+ "Get latest activities from our popular users": "الحصول على أحدث الأنشطة من مستخدمينا الشعبيين",
+ "No users available": "لا يوجد مستخدمين متاحين",
+ "Add": "إضافة",
+ "Follow": "متابعة",
+
+ "Pro Packages": "الباقات المميزة",
+ "Choose the Plan That's Right for You": "اختر الباقة التي تناسبك",
+ "Go to our website to see the plans and features and subscribe to the plan that's right for you": "أذهب إلى موقعنا لمعرفة الباقات والميزات واشترك في الباقة التي تناسبك",
+ "Go to our website": "أذهب إلى موقعنا",
+ "I updated my plan": "لقد قمت بتحديث الباقة",
+
+ "Chats": "الدردشات",
+ "No conversations found": "لا يوجد دردشات",
+ "Write a message": "كتابة رسالة",
+ "Online": "متصل",
+ "Offline": "غير متصل",
+ "Seen by": "شوهد بواسطة",
+ "typing": "يكتب",
+ "Delete": "حذف",
+ "Leave": "ترك",
+ "Leave Conversation": "ترك الدردشة",
+ "Delete Conversation": "حذف الدردشة",
+ "Are you sure you want to leave this conversation?": "هل أنت متأكد أنك تريد ترك هذه الدردشة؟",
+ "Are you sure you want to delete this conversation?": "هل أنت متأكد أنك تريد حذف هذه الدردشة؟",
+ "Sent a photo": "أرسل صورة",
+ "Sent a voice message": "أرسل رسالة صوتية",
+
+ "New Message": "رسالة جديدة",
+ "To:": "إلى:",
+
+ "Calls": "المكالمات",
+ "Your recenet calls will appear here": "ستظهر مكالماتك الأخيرة هنا",
+
+ "Contacts": "جهات الاتصال",
+ "No users found": "لم يتم العثور على مستخدمين",
+ "Search": "بحث",
+ "Search Results": "نتائج البحث",
+
+ "Settings": "الإعدادات",
+ "Privacy": "الخصوصية",
+ "Language": "اللغة",
+ "Appearance": "المظهر",
+ "Delete Account": "حذف الحساب",
+ "Sign Out": "تسجيل الخروج",
+
+ "Light Mode": "الوضع الفاتح",
+ "Dark Mode": "الوضع المظلم",
+ "System Default": "النظام الافتراضي",
+ "Adjust your theme based on your device's system settings": "قم بضبط سمة جهازك بناءً على إعدادات النظام لجهازك",
+
+ "QR Code": "الباركود",
+ "When you share your QR code, People can message and call you": "عند مشاركة الباركود الخاص بك، يمكن للأشخاص الرسائل والمكالمات معك",
+ "Reset QR Code": "إعادة تعيين الباركود",
+ "Share": "مشاركة",
+
+ "Once you delete your account you will no longer can access it again": "إذا قمت بحذف حسابك، لن يكون لديك إمكانية الوصول إليه مرة أخرى"
+}
