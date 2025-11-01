@@ -305,7 +305,7 @@ class _NewMessageState extends ConsumerState<NewMessage> {
                 ChatComposer(
                   selectedContacts: selectedContacts,
                   onSendMessage: (data) {
-                    context.router.pop();
+                    context.router.maybePop();
                     context.router.push(ConversationRoute(conversationId: data['conversation_id']));
                   },
                 ),
