@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "messaging.sngine.app"
+    namespace = "messaging.sfs.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "28.0.13004108"
 
