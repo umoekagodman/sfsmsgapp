@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';          // <-- NEW
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'dart:ui' as ui;  // Fix for TextDirection conflict
 
 import '../../routes/router.gr.dart';
 import '../../widgets/language_dialog.dart';
@@ -51,8 +51,7 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             // ───── TOP BAR: DM LOGO (left) + LANGUAGE (right) ─────
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
                   // DM LOGO
@@ -123,31 +122,42 @@ class _SplashScreenState extends State<SplashScreen>
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton.icon(
+                      child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          elevation: 8,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: EdgeInsets.zero,  // Remove default padding
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          backgroundBuilder: (_, __, ___) => Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF6C5CE7), Color(0xFF00D2FF)],
-                              ),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: const SizedBox.expand(),
-                          ),
+                          backgroundColor: Colors.transparent,  // Transparent base
+                          shadowColor: const Color(0xFF6C5CE7).withOpacity(0.6),
+                          elevation: 8,
                         ),
                         onPressed: () =>
                             context.router.replaceAll([const SignInRoute()]),
-                        icon: const Icon(Icons.arrow_forward, size: 20),
-                        label: Text(
-                          tr("Start Chatting"),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6C5CE7), Color(0xFF00D2FF)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                tr("Start Chatting"),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 20, color: Colors.white),
+                            ],
                           ),
                         ),
                       ),
@@ -222,7 +232,7 @@ class _DMLogoPainter extends CustomPainter {
         Offset(r * 1.28, r), r * 0.78, bgPaint..color = Colors.white);
 
     // ---- Letters ----
-    final TextPainter tpD = TextPainter(textDirection: TextDirection.ltr);
+    final TextPainter tpD = TextPainter(textDirection: ui.TextDirection.ltr);
     tpD.text = const TextSpan(
       text: 'D',
       style: TextStyle(
@@ -235,7 +245,7 @@ class _DMLogoPainter extends CustomPainter {
     tpD.layout();
     tpD.paint(canvas, Offset(r * 0.72 - tpD.width / 2, r - tpD.height / 2));
 
-    final TextPainter tpM = TextPainter(textDirection: TextDirection.ltr);
+    final TextPainter tpM = TextPainter(textDirection: ui.TextDirection.ltr);
     tpM.text = const TextSpan(
       text: 'M',
       style: TextStyle(
