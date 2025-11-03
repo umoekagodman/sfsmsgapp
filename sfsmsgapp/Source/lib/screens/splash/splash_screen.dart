@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
-// Third-party
+import 'package:flutter/rendering.dart';          // <-- NEW
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-// App files
 import '../../routes/router.gr.dart';
 import '../../widgets/language_dialog.dart';
 
@@ -21,6 +19,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
   late final Animation<double> _pulseAnim;
+  bool _logoPressed = false;
 
   @override
   void initState() {
@@ -50,21 +49,22 @@ class _SplashScreenState extends State<SplashScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // ────────────────────── TOP LOGO BAR ──────────────────────
+            // ───── TOP BAR: DM LOGO (left) + LANGUAGE (right) ─────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
-                  // DM LOGO (pressed-state highlight)
+                  // DM LOGO
                   GestureDetector(
-                    onTapDown: (_) => setState(() {}),
-                    onTapUp: (_) => setState(() {}),
-                    onTapCancel: () => setState(() {}),
+                    onTapDown: (_) => setState(() => _logoPressed = true),
+                    onTapUp: (_) => setState(() => _logoPressed = false),
+                    onTapCancel: () => setState(() => _logoPressed = false),
                     child: AnimatedBuilder(
                       animation: _pulseAnim,
                       builder: (_, __) => Transform.scale(
                         scale: _pulseAnim.value,
-                        child: const _DMLogo(isPressed: false),
+                        child: _DMLogo(isPressed: _logoPressed),
                       ),
                     ),
                   ),
@@ -84,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
 
-            // ────────────────────── WELCOME IMAGE ──────────────────────
+            // ───── WELCOME IMAGE ─────
             Expanded(
               flex: 3,
               child: Image.asset(
@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
 
-            // ────────────────────── TEXT + CTA ──────────────────────
+            // ───── TEXT + CTA ─────
             Expanded(
               flex: 2,
               child: Padding(
@@ -114,14 +114,13 @@ class _SplashScreenState extends State<SplashScreen>
                     Text(
                       tr(
                           "Ask them for anything right away - don't be shy! Speak your mind. Stay connected"),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
                         height: 1.4,
                       ),
                     ),
                     const Spacer(),
-                    // Start Chatting button (premium gradient)
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
@@ -131,11 +130,18 @@ class _SplashScreenState extends State<SplashScreen>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          backgroundColor: const Color(0xFF6C5CE7), // premium purple
-                          shadowColor: const Color(0xFF6C5CE7).withOpacity(.6),
+                          backgroundBuilder: (_, __, ___) => Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF6C5CE7), Color(0xFF00D2FF)],
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const SizedBox.expand(),
+                          ),
                         ),
-                        onPressed: () => context.router
-                            .replaceAll([const SignInRoute()]),
+                        onPressed: () =>
+                            context.router.replaceAll([const SignInRoute()]),
                         icon: const Icon(Icons.arrow_forward, size: 20),
                         label: Text(
                           tr("Start Chatting"),
@@ -157,16 +163,14 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-/// ---------------------------------------------------------------------------
-///  DM LOGO – Deutsche-Welle style, fully vector, press-highlight
-/// ---------------------------------------------------------------------------
+// ──────────────────────── DM LOGO WIDGET ────────────────────────
 class _DMLogo extends StatelessWidget {
   final bool isPressed;
   const _DMLogo({required this.isPressed});
 
   @override
   Widget build(BuildContext context) {
-    final bool dark = Theme.of(context).brightness == Brightness.dark;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 68,
       height: 68,
@@ -189,6 +193,7 @@ class _DMLogo extends StatelessWidget {
   }
 }
 
+// ──────────────────────── CUSTOM PAINTER ────────────────────────
 class _DMLogoPainter extends CustomPainter {
   final bool dark;
   final bool pressed;
@@ -200,7 +205,7 @@ class _DMLogoPainter extends CustomPainter {
     final double r = size.width / 2;
     final Offset center = Offset(r, r);
 
-    // ----- Background circles -----
+    // ---- Gradient background circles ----
     final Paint bgPaint = Paint()
       ..shader = LinearGradient(
         colors: pressed
@@ -212,10 +217,11 @@ class _DMLogoPainter extends CustomPainter {
 
     // left circle (D)
     canvas.drawCircle(Offset(r * 0.72, r), r * 0.78, bgPaint);
-    // right circle (M)
-    canvas.drawCircle(Offset(r * 1.28, r), r * 0.78, bgPaint..color = Colors.white);
+    // right circle (M) – white
+    canvas.drawCircle(
+        Offset(r * 1.28, r), r * 0.78, bgPaint..color = Colors.white);
 
-    // ----- Letters -----
+    // ---- Letters ----
     final TextPainter tpD = TextPainter(textDirection: TextDirection.ltr);
     tpD.text = const TextSpan(
       text: 'D',
