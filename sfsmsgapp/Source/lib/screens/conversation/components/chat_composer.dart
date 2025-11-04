@@ -220,7 +220,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     focusedBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                    hintText: context.tr("Write a message"),
+                    hintText: context.tr("Speak your mind"),
                     hintStyle: TextStyle(color: Colors.grey),
                   ),
                   onChanged: handleTyping,
