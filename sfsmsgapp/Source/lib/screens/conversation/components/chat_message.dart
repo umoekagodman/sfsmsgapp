@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-// Import Third Party Packages
+// Third-party
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:voice_message_package/voice_message_package.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:flutter_html/flutter_html.dart';  // <-- NEW
+import 'package:flutter_html/flutter_html.dart';          // <-- NEW
 import 'package:easy_localization/easy_localization.dart';
 
-// Import App Files
+// App files
 import '../../../common/themes.dart';
 import '../../../states/system_state.dart';
 import '../../../utilities/functions.dart';
@@ -35,14 +35,15 @@ class ChatMessage extends ConsumerWidget {
 
     final double avatarRadius = 20;
     final double avatarDiameter = avatarRadius * 2;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: Column(
-        crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          // Group: Sender name
+          // ---------- GROUP: SENDER NAME ----------
           if (!isCurrentUser && isMultipleRecipients)
             Padding(
               padding: EdgeInsets.only(
@@ -54,16 +55,18 @@ class ChatMessage extends ConsumerWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: is  isDark ? Colors.white70 : Colors.black87,
+                  color: isDark ? Colors.white70 : Colors.black87,
                 ),
               ),
             ),
 
+          // ---------- MAIN ROW ----------
           Row(
-            mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment:
+                isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar
+              // Avatar (left side only)
               if (!isCurrentUser)
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
@@ -73,19 +76,23 @@ class ChatMessage extends ConsumerWidget {
                   ),
                 ),
 
-              // Message Content
+              // ---------- BUBBLE ----------
               Flexible(
                 child: Column(
-                  crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    // TEXT MESSAGE (HTML)
+                    // ---- TEXT (HTML) ----
                     if (message['message'].isNotEmpty)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
                           color: isCurrentUser
                               ? xPrimaryColor
-                              : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
+                              : (isDark
+                                  ? const Color(0xFF3a3b3b)
+                                  : Colors.grey.shade200),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: FlutterHtml(
@@ -105,107 +112,89 @@ class ChatMessage extends ConsumerWidget {
                         ),
                       ),
 
-                    // IMAGE MESSAGE
+                    // ---- IMAGE ----
                     if (message['image'].isNotEmpty)
                       Container(
-                        margin: EdgeInsets.only(top: message['message'].isNotEmpty ? 5 : 0),
+                        margin: EdgeInsets.only(
+                            top: message['message'].isNotEmpty ? 5 : 0),
                         child: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) => Dialog(
-                                backgroundColor: Colors.transparent,
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.75),
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: PhotoView(
-                                        imageProvider: NetworkImage("${$system['system_uploads']}/${message['image']}"),
-                                        backgroundDecoration: const BoxDecoration(color: Colors.transparent),
-                                        minScale: PhotoViewComputedScale.contained,
-                                        maxScale: PhotoViewComputedScale.covered * 2,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 10,
-                                      right: 10,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.download, color: Colors.white),
-                                        onPressed: () async {
-                                          final saved = await saveImageToGallery("${$system['system_uploads']}/${message['image']}");
-                                          if (saved) showSavedOverlay(context);
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ),
-                                    Positioned(
-                                     : 10,
-                                      left: 10,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.close, color: Colors.white),
-                                        onPressed: () => Navigator.of(context).pop(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                          onTap: () => _showImageFullScreen(context, $system, message),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(18),
                             child: Image.network(
                               "${$system['system_uploads']}/${message['image']}",
                               width: 200,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(Icons.error),
                             ),
                           ),
                         ),
                       ),
 
-                    // VOICE MESSAGE
+                    // ---- VOICE NOTE ----
                     if (message['voice_note'].isNotEmpty)
                       Container(
-                        margin: EdgeInsets.only(top: message['message'].isNotEmpty ? 5 : 0),
+                        margin: EdgeInsets.only(
+                            top: message['message'].isNotEmpty ? 5 : 0),
                         child: VoiceMessageView(
                           controller: VoiceController(
-                            audioSrc: "${$system['system_uploads']}/${message['voice_note']}",
-                            maxDuration: Duration(seconds: int.parse($system['voice_notes_durtaion'] ?? '60')),
+                            audioSrc:
+                                "${$system['system_uploads']}/${message['voice_note']}",
+                            maxDuration: Duration(
+                                seconds: int.parse(
+                                    $system['voice_notes_durtaion'] ?? '60')),
                             isFile: false,
+                            // Required callbacks (empty is fine)
+                            onComplete: () {},
+                            onPause: () {},
+                            onPlaying: () {},
                           ),
                           innerPadding: 12,
                           cornerRadius: 18,
                           backgroundColor: isCurrentUser
                               ? xPrimaryColor
-                              : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
-                          activeSliderColor: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
-                          circlesColor: isCurrentUser ? xPrimaryColor : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
+                              : (isDark
+                                  ? const Color(0xFF3a3b3b)
+                                  : Colors.grey.shade200),
+                          activeSliderColor:
+                              isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
+                          circlesColor: isCurrentUser
+                              ? xPrimaryColor
+                              : (isDark
+                                  ? const Color(0xFF3a3b3b)
+                                  : Colors.grey.shade200),
                           playIcon: Icon(Icons.play_arrow_rounded,
-                              color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black)),
+                              color: isCurrentUser
+                                  ? Colors.white
+                                  : (isDark ? Colors.white : Colors.black)),
                           pauseIcon: Icon(Icons.pause_rounded,
-                              color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black)),
+                              color: isCurrentUser
+                                  ? Colors.white
+                                  : (isDark ? Colors.white : Colors.black)),
                           size: 40,
                           counterTextStyle: TextStyle(
-                            color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
+                            color: isCurrentUser
+                                ? Colors.white
+                                : (isDark ? Colors.white : Colors.black),
                             fontSize: 10,
                           ),
                           circlesTextStyle: TextStyle(
-                            color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
+                            color: isCurrentUser
+                                ? Colors.white
+                                : (isDark ? Colors.white : Colors.black),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
 
-                    // TIMESTAMP
+                    // ---- TIMESTAMP ----
                     Container(
                       margin: const EdgeInsets.only(top: 5),
                       child: Text(
-                        timeago.format(convertedTime(message['time']), locale: languageCode),
+                        timeago.format(convertedTime(message['time']),
+                            locale: languageCode),
                         style: TextStyle(
                           fontSize: 11,
                           color: isDark ? Colors.white60 : Colors.grey[600],
@@ -218,6 +207,58 @@ class ChatMessage extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  // --------------------------------------------------------------
+  // Helper: Full-screen image viewer
+  // --------------------------------------------------------------
+  void _showImageFullScreen(
+      BuildContext context, Map<String, dynamic> system, Map<String, dynamic> msg) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.75),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: PhotoView(
+                imageProvider:
+                    NetworkImage("${system['system_uploads']}/${msg['image']}"),
+                backgroundDecoration: const BoxDecoration(color: Colors.transparent),
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered * 2,
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: IconButton(
+                icon: const Icon(Icons.download, color: Colors.white),
+                onPressed: () async {
+                  final saved = await saveImageToGallery(
+                      "${system['system_uploads']}/${msg['image']}");
+                  if (saved) showSavedOverlay(context);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+            Positioned(
+              top: 10,
+              left: 10,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
