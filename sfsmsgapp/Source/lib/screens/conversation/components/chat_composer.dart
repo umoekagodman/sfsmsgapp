@@ -36,251 +36,254 @@ class ChatComposer extends ConsumerStatefulWidget {
 }
 
 class _ChatComposerState extends ConsumerState<ChatComposer> {
-  final textMessageController = TextEditingController();
-  Timer? typingTimer;
-  bool isTyping = false;
-  String imageUrl = '';
-  bool uploadingImage = false;
-  String voiceNoteUrl = '';
-  bool isRecording = false;
+  final _textController = TextEditingController();
+  final _focusNode = FocusNode();
+  Timer? _typingTimer;
+  bool _isTyping = false;
+  String _imageUrl = '';
+  bool _uploadingImage = false;
+  String _voiceNoteUrl = '';
+  bool _isRecording = false;
 
-  // API Call: sendMessage
-  Future<void> sendMessage() async {
+  // Send message
+  Future<void> _sendMessage() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty && _imageUrl.isEmpty && _voiceNoteUrl.isEmpty) return;
+
     final response = await sendAPIRequest(
       'chat/message',
       method: 'POST',
       body: {
-        'message': textMessageController.text,
-        if (imageUrl.isNotEmpty) 'photo': imageUrl,
-        if (voiceNoteUrl.isNotEmpty) 'voice_note': voiceNoteUrl,
-        if (widget.conversation != null && widget.conversation!.isNotEmpty) 'conversation_id': widget.conversation!['conversation_id'],
-        if ((widget.conversation == null || widget.conversation!.isEmpty) && widget.user != null) 'recipients': [widget.user!['user_id']].toString(),
+        if (text.isNotEmpty) 'message': text,
+        if (_imageUrl.isNotEmpty) 'photo': _imageUrl,
+        if (_voiceNoteUrl.isNotEmpty) 'voice_note': _voiceNoteUrl,
+        if (widget.conversation != null && widget.conversation!.isNotEmpty)
+          'conversation_id': widget.conversation!['conversation_id'],
+        if ((widget.conversation == null || widget.conversation!.isEmpty) && widget.user != null)
+          'recipients': [widget.user!['user_id']].toString(),
         if (widget.selectedContacts != null && widget.selectedContacts!.isNotEmpty)
           'recipients': widget.selectedContacts!.map((e) => e['user_id']).toList().toString(),
       },
     );
-    if (response['statusCode'] == 200) {
-      if (response['body']['data'] is Map && response['body']['data'].isNotEmpty) {
-        widget.onNewMessage?.call(response['body']['data']);
-        widget.onSendMessage?.call(response['body']['data']);
-        setState(() {
-          isTyping = false;
-          imageUrl = '';
-          uploadingImage = false;
-          voiceNoteUrl = '';
-          isRecording = false;
-          textMessageController.clear();
-        });
-      }
-    } else if (response['statusCode'] != 500) {
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          snackBarWarning(response['body']['message']),
-        );
+
+    if (response['statusCode'] == 200 && response['body']['data'] is Map) {
+      widget.onNewMessage?.call(response['body']['data']);
+      widget.onSendMessage?.call(response['body']['data']);
+      _resetInput();
     } else {
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(tr("There is something that went wrong!")),
-          ),
-        );
+        ..showSnackBar(snackBarWarning(response['body']['message'] ?? tr("There is something that went wrong!")));
     }
   }
 
-  // API Call: updateTypingStatus
-  Future<void> updateTypingStatus(bool isTyping) async {
+  void _resetInput() {
+    setState(() {
+      _textController.clear();
+      _isTyping = false;
+      _imageUrl = '';
+      _uploadingImage = false;
+      _voiceNoteUrl = '';
+      _isRecording = false;
+    });
+  }
+
+  // Typing indicator
+  void _handleTyping(String value) {
+    final wasTyping = _isTyping;
+    _isTyping = value.trim().isNotEmpty;
+
+    if (_isTyping != wasTyping) {
+      _typingTimer?.cancel();
+      _typingTimer = Timer(const Duration(milliseconds: 500), () {
+        _updateTypingStatus(_isTyping);
+      });
+    }
+  }
+
+  Future<void> _updateTypingStatus(bool typing) async {
     final $system = ref.read(systemProvider);
     if (!isTrue($system['chat_typing_enabled'])) return;
     if (widget.conversation == null || widget.conversation!.isEmpty) return;
+
     await sendAPIRequest(
       'chat/reactions/typing',
       method: 'POST',
       body: {
-        'is_typing': isTyping,
+        'is_typing': typing,
         'conversation_id': widget.conversation!['conversation_id'],
       },
     );
   }
 
-  // Handle typing status
-  void handleTyping(String value) {
-    setState(() {
-      isTyping = value.isNotEmpty;
-    });
-    /* cancel existing timer if any */
-    typingTimer?.cancel();
-    /* set new timer */
-    typingTimer = Timer(const Duration(milliseconds: 500), () {
-      updateTypingStatus(value.isNotEmpty);
-    });
-  }
-
-  // Handle Delete Image
-  Future<void> handleDeleteImage() async {
-    var src = imageUrl;
-    setState(() {
-      imageUrl = '';
-    });
-    await sendAPIRequest(
-      'data/delete',
-      method: 'POST',
-      body: {
-        'src': src,
-      },
-    );
+  // Delete uploaded image
+  Future<void> _deleteImage() async {
+    final src = _imageUrl;
+    setState(() => _imageUrl = '');
+    await sendAPIRequest('data/delete', method: 'POST', body: {'src': src});
   }
 
   @override
   void dispose() {
+    _typingTimer?.cancel();
+    _textController.dispose();
+    _focusNode.dispose();
     super.dispose();
-    typingTimer?.cancel();
-    textMessageController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final $system = ref.read(systemProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final inputBg = isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade100;
+    final hintColor = isDark ? Colors.grey[400] : Colors.grey[600];
+
     return Container(
-      padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            /* Attach Images Button */
-            if (isTrue($system['chat_photos_enabled']))
-              if (imageUrl.isEmpty && !uploadingImage)
-                IconButton(
-                  onPressed: () async {
-                    final response = await showImageUploadOptions(
-                      context: context,
-                      setUploadingState: (isUploading) {
-                        setState(() {
-                          uploadingImage = isUploading;
-                        });
-                      },
-                    );
-                    if (response != null) {
-                      setState(() {
-                        imageUrl = response;
-                      });
-                    }
-                  },
-                  icon: SvgPicture.asset(
-                    "assets/images/icons/chat/image.svg",
-                    colorFilter: ColorFilter.mode(xPrimaryColor, BlendMode.srcIn),
-                  ),
+            // Attach Photo
+            if (isTrue($system['chat_photos_enabled']) && _imageUrl.isEmpty && !_uploadingImage)
+              IconButton(
+                onPressed: () async {
+                  setState(() => _uploadingImage = true);
+                  final url = await showImageUploadOptions(
+                    context: context,
+                    setUploadingState: (uploading) => setState(() => _uploadingImage = uploading),
+                  );
+                  if (url != null) setState(() => _imageUrl = url);
+                },
+                icon: SvgPicture.asset(
+                  "assets/images/icons/chat/image.svg",
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(xPrimaryColor, BlendMode.srcIn),
                 ),
-            if (imageUrl.isNotEmpty)
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(2),
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(40),
-                      border: Border.all(color: xPrimaryColor, width: 1),
-                    ),
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage("${$system['system_uploads']}/${imageUrl}"),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: handleDeleteImage,
-                    icon: Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                      size: 20,
-                    ),
-                  ),
-                ],
               ),
-            if (uploadingImage)
+
+            // Uploading Spinner
+            if (_uploadingImage)
               Container(
-                margin: const EdgeInsets.only(right: 10),
-                child: SpinKitDoubleBounce(
-                  color: xPrimaryColor,
-                  size: 40,
+                margin: const EdgeInsets.only(right: 8),
+                child: const SpinKitCircle(color: xPrimaryColor, size: 20),
+              ),
+
+            // Image Preview
+            if (_imageUrl.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: xPrimaryColor, width: 1.5),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          "${$system['system_uploads']}/$_imageUrl",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: -6,
+                      right: -6,
+                      child: IconButton(
+                        icon: const Icon(Icons.cancel, color: Colors.red, size: 20),
+                        onPressed: _deleteImage,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            /* Text Message Input */
+
+            // Text Input (Expandable)
             Expanded(
               child: Container(
-                padding: EdgeInsets.all(0),
+                constraints: const BoxConstraints(maxHeight: 120),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3a3b3b) : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(40),
+                  color: inputBg,
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
-                  controller: textMessageController,
+                  controller: _textController,
+                  focusNode: _focusNode,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  minLines: 1,
+                  maxLines: null,
                   decoration: InputDecoration(
+                    hintText: tr('Speak your mind'),
+                    hintStyle: TextStyle(color: hintColor, fontSize: 16),
                     border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                    hintText: context.tr("Speak your mind"),
-                    hintStyle: TextStyle(color: Colors.grey),
+                    isDense: true,
                   ),
-                  onChanged: handleTyping,
+                  style: TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                  onChanged: _handleTyping,
+                  onSubmitted: (_) => _sendMessage(), // Done = send
                 ),
               ),
             ),
-            /* Send Message Button */
-            if (isTyping || imageUrl.isNotEmpty)
-              IconButton(
-                onPressed: sendMessage,
-                icon: SvgPicture.asset(
-                  "assets/images/icons/chat/send.svg",
-                  colorFilter: ColorFilter.mode(xPrimaryColor, BlendMode.srcIn),
+
+            // Send Button
+            if (_isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: xPrimaryColor,
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                    onPressed: _sendMessage,
+                  ),
                 ),
               ),
-            /* Voice Note Button */
-            if (isTrue($system['voice_notes_chat_enabled']) && !isTyping && imageUrl.isEmpty)
-              Row(
-                children: [
-                  if (isRecording) ...[
-                    const TimerWidget(),
-                  ],
-                  IconButton(
-                    onPressed: () async {
-                      if (!isRecording) {
-                        await VoiceRecorder().startRecording(
-                          context: context,
-                          setRecordingState: (_isRecording) {
-                            setState(() {
-                              isRecording = _isRecording;
-                            });
-                          },
-                        );
-                      } else {
-                        final response = await VoiceRecorder().stopRecording(
-                          context: context,
-                          setRecordingState: (_isRecording) {
-                            setState(() {
-                              isRecording = _isRecording;
-                            });
-                          },
-                        );
-                        if (response != null) {
-                          setState(() {
-                            voiceNoteUrl = response;
-                          });
-                          await sendMessage();
-                        }
-                      }
-                    },
-                    icon: SvgPicture.asset(
-                      "assets/images/icons/chat/mic.svg",
-                      colorFilter: ColorFilter.mode(
-                        isRecording ? Colors.red : xPrimaryColor,
-                        BlendMode.srcIn,
+
+            // Voice Button
+            if (isTrue($system['voice_notes_chat_enabled']) && !_isTyping && _imageUrl.isEmpty && _voiceNoteUrl.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Row(
+                  children: [
+                    if (_isRecording) ...[
+                      const TimerWidget(),
+                      const SizedBox(width: 8),
+                    ],
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: _isRecording ? Colors.red : xPrimaryColor,
+                      child: IconButton(
+                        icon: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white),
+                        onPressed: () async {
+                          if (!_isRecording) {
+                            await VoiceRecorder().startRecording(
+                              context: context,
+                              setRecordingState: (recording) => setState(() => _isRecording = recording),
+                            );
+                          } else {
+                            final url = await VoiceRecorder().stopRecording(
+                              context: context,
+                              setRecordingState: (recording) => setState(() => _isRecording = recording),
+                            );
+                            if (url != null) {
+                              setState(() => _voiceNoteUrl = url);
+                              await _sendMessage();
+                            }
+                          }
+                        },
                       ),
                     ),
-                  ),
-                ],
-              )
+                  ],
+                ),
+              ),
           ],
         ),
       ),
