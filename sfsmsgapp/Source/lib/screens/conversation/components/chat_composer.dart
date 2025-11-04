@@ -16,7 +16,7 @@ import '../../../widgets/timer.dart';
 class ChatComposer extends ConsumerStatefulWidget {
   final String? conversationId;
   final Map<String, dynamic>? conversation;
-  final Map<String, dynamic>? user;
+  final Map<String, dynamic>? user; 
   final List<dynamic>? selectedContacts;
   final Function(Map<String, dynamic>)? onSendMessage;
   final Function(Map<String, dynamic>)? onNewMessage;
