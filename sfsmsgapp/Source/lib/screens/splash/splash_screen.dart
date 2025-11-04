@@ -62,14 +62,14 @@ class SplashScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tr("Chat with strangers"),
+                      tr("Welcome to dm,"),
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 19),
-                    Text(tr("Ask them for anything right away - don't be shy! Speak your mind. Stay connected")),
+                    const SizedBox(height: 20),
+                    Text(tr("the free messenger for bold connections, no strings attached.")),
                     const Spacer(),
                     ElevatedButton(
                       onPressed: () {
