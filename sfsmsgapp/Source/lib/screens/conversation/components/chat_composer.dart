@@ -221,7 +221,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                   minLines: 1,
                   maxLines: null,
                   decoration: InputDecoration(
-                    hintText: tr('Speak your mind'),
+                    hintText: tr('Speak your mind...'),
                     hintStyle: TextStyle(color: hintColor, fontSize: 16),
                     border: InputBorder.none,
                     isDense: true,
