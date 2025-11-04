@@ -82,35 +82,32 @@ class ChatMessage extends ConsumerWidget {
                   crossAxisAlignment:
                       isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    // ---- TEXT (HTML) ----
-                    if (message['message'].isNotEmpty)
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: isCurrentUser
-                              ? xPrimaryColor
-                              : (isDark
-                                  ? const Color(0xFF3a3b3b)
-                                  : Colors.grey.shade200),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: FlutterHtml(
-                          data: message['message'],
-                          style: {
-                            "body": Style(
-                              margin: Margins.zero,
-                              padding: HtmlPaddings.zero,
-                              fontSize: FontSize(16),
-                              color: isCurrentUser
-                                  ? Colors.white
-                                  : (isDark ? Colors.white70 : Colors.black87),
-                              lineHeight: const LineHeight(1.4),
-                            ),
-                            "br": Style(display: Display.block),
-                          },
-                        ),
-                      ),
+                    // ---- TEXT (HTML) ---
+if (message['message'].isNotEmpty)
+  Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    decoration: BoxDecoration(
+      color: isCurrentUser
+          ? xPrimaryColor
+          : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Html(  // ← FIXED: Html, not FlutterHtml
+      data: message['message'],
+      style: {
+        "body": Style(
+          margin: Margins.zero,
+          padding: HtmlPaddings.zero,
+          fontSize: FontSize(16),
+          color: isCurrentUser
+              ? Colors.white
+              : (isDark ? Colors.white70 : Colors.black87),
+          lineHeight: const LineHeight(1.4),
+        ),
+        "br": Style(display: Display.block),
+      },
+    ),
+  ),
 
                     // ---- IMAGE ----
                     if (message['image'].isNotEmpty)
