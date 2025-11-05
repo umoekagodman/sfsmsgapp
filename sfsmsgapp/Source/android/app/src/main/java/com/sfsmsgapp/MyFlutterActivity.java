@@ -8,6 +8,6 @@ public class MyFlutterActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(FlutterEngine flutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
-        // Preload auth, config, etc. here
+        // Preload auth, config, etc. here 
     }
 }
