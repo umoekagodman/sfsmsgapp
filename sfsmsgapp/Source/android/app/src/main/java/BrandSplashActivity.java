@@ -1,4 +1,4 @@
-package com.sfsmsgapp;
+package messaging.sfs.app;
 
 import android.content.Intent;
 import android.os.Bundle;
