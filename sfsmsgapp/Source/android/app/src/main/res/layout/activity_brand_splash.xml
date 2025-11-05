@@ -11,7 +11,7 @@
         android:id="@+id/logo_main"
         android:layout_width="125dp"
         android:layout_height="72dp"
-        android:src="@drawable/welcome_logo"
+        android:src="@drawable/welcome_logo" 
         android:contentDescription="SFS Logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
