@@ -21,8 +21,8 @@
     <!-- from SFS Social -->
     <ImageView
         android:id="@+id/logo_branding"
-        android:layout_width="195dp"
-        android:layout_height="48dp"
+        android:layout_width="97dp"
+        android:layout_height="24dp"
         android:contentDescription="from SFS Social"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
