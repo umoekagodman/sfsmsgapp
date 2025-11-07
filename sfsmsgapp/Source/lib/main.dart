@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // ADD THIS IMPORT
 
 // Import Third Party Packages
 import 'package:easy_localization/easy_localization.dart';
@@ -8,7 +9,7 @@ import 'package:auto_route/auto_route.dart';
 
 // Import App Files
 import 'utilities/dev/http_overrides.dart';
-import 'common/themes.dart';
+import 'common/themes.dart'; // Make sure this imports the updated theme.dart
 import 'routes/router.dart';
 import 'routes/router.gr.dart';
 import 'utilities/functions.dart';
@@ -56,33 +57,38 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Go directly to splash screen without loading states
+    // Get current theme mode
+    final themeMode = ref.watch(appThemeModeProvider).value ?? ThemeMode.light;
+    final isDark = themeMode == ThemeMode.dark || 
+                  (themeMode == ThemeMode.system && 
+                   MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+    // Set system UI overlay style
+    setSystemUIOverlayStyle(isDark);
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'DM Messenger',
-      theme: appTheme(context: context),
+      theme: appTheme(context: context, isDark: false),
       darkTheme: appTheme(context: context, isDark: true),
-      themeMode: ref.watch(appThemeModeProvider).value ?? ThemeMode.light,
+      themeMode: themeMode,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       routerDelegate: appRouter.delegate(
-        // Go directly to splash screen - remove all loading checks
+        // Go directly to splash screen
         initialDeepLink: '/splash',
       ),
       routeInformationParser: appRouter.defaultRouteParser(),
       builder: (context, child) {
-        // Add system UI overlay styling for navigation bar
+        // Ensure system UI styling is applied to all screens
+        final currentIsDark = Theme.of(context).brightness == Brightness.dark;
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
-            systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
-            systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.dark 
-                ? Brightness.light 
-                : Brightness.dark,
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark 
-                ? Brightness.light 
-                : Brightness.dark,
+            statusBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
+            systemNavigationBarColor: currentIsDark ? xBackgroundColorDark : xBackgroundColor,
+            systemNavigationBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
           ),
           child: child!,
         );
