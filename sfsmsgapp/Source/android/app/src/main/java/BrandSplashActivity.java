@@ -6,12 +6,19 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.WindowCompat;
 
 public class BrandSplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Apply the theme based on system settings
+        int nightModeFlags = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        if (nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            setTheme(R.style.Theme_AppCompat_NoActionBar);
+        } else {
+            setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+        }
 
         // Fullscreen
         getWindow().setFlags(
@@ -22,19 +29,19 @@ public class BrandSplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_brand_splash);
 
         // Auto dark mode
-        boolean isDark = (getResources().getConfiguration().uiMode & 0x30) == 0x20;
-        findViewById(R.id.logo_main).setBackgroundResource(
+        boolean isDark = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        ((android.widget.ImageView) findViewById(R.id.logo_main)).setImageResource(
             isDark ? R.drawable.welcome_logo_light : R.drawable.welcome_logo
         );
-        findViewById(R.id.logo_branding).setBackgroundResource(
+        ((android.widget.ImageView) findViewById(R.id.logo_branding)).setImageResource(
             isDark ? R.drawable.logo_branding_light : R.drawable.logo_branding
         );
 
-        // Go to Flutter
+        // Extended duration - show native splash while Flutter loads data
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             startActivity(new Intent(this, MyFlutterActivity.class));
-            overridePendingTransition(0, 0);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();
-        }, 1200);
+        }, 3000); // Extended to 3 seconds to allow data loading
     }
 }
