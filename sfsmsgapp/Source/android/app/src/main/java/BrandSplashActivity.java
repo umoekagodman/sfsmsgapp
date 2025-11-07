@@ -12,12 +12,12 @@ public class BrandSplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Apply the theme based on system settings
+        // Apply the theme based on system settings - USE CORRECT THEME NAMES
         int nightModeFlags = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
         if (nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
-            setTheme(R.style.Theme_AppCompat_NoActionBar);
+            setTheme(android.R.style.Theme_AppCompat); // Use built-in AppCompat theme
         } else {
-            setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+            setTheme(android.R.style.Theme_AppCompat_Light); // Use built-in AppCompat Light theme
         }
 
         // Fullscreen
