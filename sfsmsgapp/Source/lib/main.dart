@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // ADD THIS IMPORT
+import 'package:flutter/services.dart';
 
 // Import Third Party Packages
 import 'package:easy_localization/easy_localization.dart';
@@ -9,14 +9,11 @@ import 'package:auto_route/auto_route.dart';
 
 // Import App Files
 import 'utilities/dev/http_overrides.dart';
-import 'common/themes.dart'; // Make sure this imports the updated theme.dart
+import 'common/themes.dart';
 import 'routes/router.dart';
 import 'routes/router.gr.dart';
 import 'utilities/functions.dart';
-import 'screens/error/error_screen.dart';
-import 'screens/loading/loading_screen.dart';
 import 'states/apptheme_state.dart';
-import 'states/system_state.dart';
 
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides(); /* For Development Only */
@@ -76,8 +73,7 @@ class MyApp extends ConsumerWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       routerDelegate: appRouter.delegate(
-        // Go directly to splash screen
-        initialDeepLink: '/splash',
+        // Remove initialDeepLink to use the default initial route
       ),
       routeInformationParser: appRouter.defaultRouteParser(),
       builder: (context, child) {
