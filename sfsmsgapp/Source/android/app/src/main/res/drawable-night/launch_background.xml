@@ -2,21 +2,21 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="?android:colorBackground" />
 
-    <!-- Main Logo (light variant for dark mode) -->
+    <!-- Main Logo - auto switch via drawable resource -->
     <item
         android:width="125dp"
         android:height="72dp"
         android:gravity="center_horizontal|top"
         android:top="200dp">
-        <bitmap android:src="@drawable/welcome_logo_light" />
+        <bitmap android:src="@drawable/welcome_logo" />
     </item>
 
-    <!-- Branding Logo (light variant) -->
+    <!-- Branding Logo -->
     <item
         android:width="97dp"
         android:height="24dp"
         android:gravity="center_horizontal|top"
         android:top="650dp">
-        <bitmap android:src="@drawable/logo_branding_light" />
+        <bitmap android:src="@drawable/logo_branding" />
     </item>
 </layer-list>
