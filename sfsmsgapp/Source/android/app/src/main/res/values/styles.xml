@@ -3,9 +3,8 @@
     <!-- Theme applied to the Android Window while the process is starting -->
     <style name="LaunchTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <item name="android:windowNoTitle">true</item> 
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item> <!-- Optional for notches -->
     </style>
 
     <!-- Theme applied after process starts -->
