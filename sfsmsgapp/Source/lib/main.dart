@@ -14,7 +14,6 @@ import 'routes/router.dart';
 import 'routes/router.gr.dart';
 import 'utilities/functions.dart';
 import 'screens/error/error_screen.dart';
-import 'screens/loading/loading_screen.dart';
 import 'states/apptheme_state.dart';
 import 'states/system_state.dart';
 
@@ -22,9 +21,15 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides(); /* For Development Only */
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  
+  // Pre-load system configuration BEFORE running the app
+  final container = ProviderContainer();
+  await container.read(systemConfigProvider.future);
+  
   final appRouter = AppRouter();
   runApp(
     ProviderScope(
+      parent: container,
       child: EasyLocalization(
         supportedLocales: const [
           Locale('ar', 'SA'),
@@ -57,53 +62,69 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get current theme mode
-    final themeMode = ref.watch(appThemeModeProvider).value ?? ThemeMode.light;
-    final isDark = themeMode == ThemeMode.dark || 
-                  (themeMode == ThemeMode.system && 
-                   MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+    // Data should already be loaded, but handle any errors
+    final systemState = ref.watch(systemConfigProvider);
+    
+    return systemState.when(
+      loading: () => _buildSplashApp(context), // Show minimal splash if still loading
+      error: (error, _) => ErrorScreen(message: error.toString()),
+      data: (_) {
+        final $system = ref.watch(systemProvider);
+        final $user = ref.watch(userProvider);
+        final themeMode = ref.watch(appThemeModeProvider).value ?? ThemeMode.light;
+        final isDark = themeMode == ThemeMode.dark || 
+                      (themeMode == ThemeMode.system && 
+                       MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
-    // Set system UI overlay style
-    setSystemUIOverlayStyle(isDark);
+        setSystemUIOverlayStyle(isDark);
 
-    return ref.watch(systemConfigProvider).when(
-          loading: () => LoadingScreen(), // Show loading while fetching system config
-          error: (error, _) => ErrorScreen(message: error.toString()),
-          data: (_) {
-            final $system = ref.watch(systemProvider);
-            final $user = ref.watch(userProvider);
-            
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              title: $system['system_title'],
-              theme: appTheme(context: context, isDark: false),
-              darkTheme: appTheme(context: context, isDark: true),
-              themeMode: themeMode,
-              localizationsDelegates: context.localizationDelegates,
-              supportedLocales: context.supportedLocales,
-              locale: context.locale,
-              routerDelegate: appRouter.delegate(
-                deepLinkBuilder: (_) => DeepLink(
-                  // Go to appropriate screen based on user state
-                  [$user.isNotEmpty ? goHome(ref, context: context, returnRoute: true) : const SplashRoute()],
-                ),
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          title: $system['system_title'],
+          theme: appTheme(context: context, isDark: false),
+          darkTheme: appTheme(context: context, isDark: true),
+          themeMode: themeMode,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          routerDelegate: appRouter.delegate(
+            deepLinkBuilder: (_) => DeepLink(
+              [$user.isNotEmpty ? goHome(ref, context: context, returnRoute: true) : const SplashRoute()],
+            ),
+          ),
+          routeInformationParser: appRouter.defaultRouteParser(),
+          builder: (context, child) {
+            final currentIsDark = Theme.of(context).brightness == Brightness.dark;
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
+                systemNavigationBarColor: currentIsDark ? xBackgroundColorDark : xBackgroundColor,
+                systemNavigationBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
               ),
-              routeInformationParser: appRouter.defaultRouteParser(),
-              builder: (context, child) {
-                // Ensure system UI styling is applied to all screens
-                final currentIsDark = Theme.of(context).brightness == Brightness.dark;
-                return AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: SystemUiOverlayStyle(
-                    statusBarColor: Colors.transparent,
-                    statusBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
-                    systemNavigationBarColor: currentIsDark ? xBackgroundColorDark : xBackgroundColor,
-                    systemNavigationBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
-                  ),
-                  child: child!,
-                );
-              },
+              child: child!,
             );
           },
         );
+      },
+    );
+  }
+
+  // Minimal splash as fallback (should rarely be seen)
+  Widget _buildSplashApp(BuildContext context) {
+    final isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: isDark ? const Color(0xFF242526) : Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              isDark ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
