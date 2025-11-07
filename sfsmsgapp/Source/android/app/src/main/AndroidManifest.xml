@@ -10,7 +10,7 @@
         <!-- 1. NATIVE SPLASH (WhatsApp style) -->
         <activity
             android:name=".BrandSplashActivity"
-            android:exported="true"
+            android:exported="true" 
             android:theme="@style/LaunchTheme">  <!-- CHANGED THIS LINE -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
