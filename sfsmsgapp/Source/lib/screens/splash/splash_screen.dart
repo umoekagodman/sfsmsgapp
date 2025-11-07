@@ -74,7 +74,7 @@ class SplashScreen extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonBg,
                           foregroundColor: buttonText,
-                          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 30),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
