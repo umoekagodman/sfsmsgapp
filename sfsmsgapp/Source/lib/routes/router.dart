@@ -24,7 +24,13 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-        // Splash Screen
+        // Splash Screen - SET AS INITIAL ROUTE
+        AutoRoute(
+          path: '/', // Use root path as initial
+          page: SplashRoute.page,
+          initial: true, // This makes it the initial route
+        ),
+        // Splash Screen (alternative path)
         AutoRoute(
           path: SplashScreen.routeName,
           page: SplashRoute.page,
