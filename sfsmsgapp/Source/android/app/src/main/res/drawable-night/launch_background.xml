@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="?android:colorBackground" /> <!-- Dynamic background -->
+
+    <!-- Main Logo (dark mode variant) -->
+    <item>
+        <bitmap
+            android:src="@drawable/welcome_logo_light"
+            android:gravity="center_horizontal|top"
+            android:width="125dp"
+            android:height="72dp"
+            android:top="20%" />
+    </item>
+
+    <!-- Branding Logo (dark mode variant) -->
+    <item>
+        <bitmap
+            android:src="@drawable/logo_branding_light"
+            android:gravity="center_horizontal|bottom"
+            android:width="97dp"
+            android:height="24dp"
+            android:bottom="10%" />
+    </item>
+</layer-list>
