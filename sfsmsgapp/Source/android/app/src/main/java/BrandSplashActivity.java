@@ -12,7 +12,7 @@ public class BrandSplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // NO setContentView() — we use windowBackground from theme
+        // DO NOT CALL setContentView() — use windowBackground from theme
         getWindow().setFlags(
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
