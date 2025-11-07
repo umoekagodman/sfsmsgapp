@@ -18,7 +18,8 @@ class SplashScreen extends StatelessWidget {
 
     // Dynamic colors
     final buttonBg = isDark ? const Color(0xFFD1D1D1) : const Color(0xFF000000);
-    final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFD1D1D1);
+    final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+    final arrowColor = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +27,7 @@ class SplashScreen extends StatelessWidget {
         elevation: 0,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 14, right: 8),
+            padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
             child: Image.asset(logoPath, width: 83, height: 48),
           ),
           const Spacer(),
@@ -65,7 +66,7 @@ class SplashScreen extends StatelessWidget {
                     ),
                     const Spacer(),
 
-                    // PERFECT BUTTON
+                    // FIXED BUTTON - Text aligned left, arrow right
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -73,7 +74,7 @@ class SplashScreen extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonBg,
                           foregroundColor: buttonText,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -82,7 +83,6 @@ class SplashScreen extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const SizedBox(width: 24), // Left padding
                             Text(
                               tr("Start Chatting"),
                               style: TextStyle(
@@ -91,13 +91,10 @@ class SplashScreen extends StatelessWidget {
                                 color: buttonText,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 16),
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: Colors.white,
-                                size: 22,
-                              ),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: arrowColor, // Dynamic arrow color
+                              size: 22,
                             ),
                           ],
                         ),
