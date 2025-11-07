@@ -11,7 +11,7 @@
         <activity
             android:name=".BrandSplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">  <!-- CHANGED THIS LINE -->
+            android:theme="@style/LaunchTheme">  <!-- CHANGED THIS LINE -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
