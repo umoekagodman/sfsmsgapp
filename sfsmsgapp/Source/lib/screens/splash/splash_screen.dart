@@ -93,7 +93,7 @@ class SplashScreen extends StatelessWidget {
                             ),
                             Icon(
                               Icons.arrow_forward,
-                              color: arrowColor, // Dynamic arrow color
+                              color: arrowColor,
                               size: 22,
                             ),
                           ],
