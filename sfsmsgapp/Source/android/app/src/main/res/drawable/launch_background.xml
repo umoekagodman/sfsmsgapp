@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" /> <!-- Matches your dynamic background -->
+    <item android:drawable="?android:colorBackground" />
 
-    <!-- Main Logo (approximates vertical bias 0.38 with center gravity + top offset if needed) -->
-    <item>
-        <bitmap
-            android:src="@drawable/welcome_logo"
-            android:gravity="center_horizontal|top"
-            android:width="125dp"
-            android:height="72dp"
-            android:top="20%" /> <!-- Adjust 'top' percentage to fine-tune positioning (e.g., 15-25% for bias ~0.38) -->
+    <!-- Main Logo: positioned at ~38% from top (bias 0.38) -->
+    <item
+        android:width="125dp"
+        android:height="72dp"
+        android:gravity="center_horizontal|top"
+        android:top="200dp">
+        <bitmap android:src="@drawable/welcome_logo" />
     </item>
 
-    <!-- Branding Logo (approximates vertical bias 0.88 with bottom gravity) -->
-    <item>
-        <bitmap
-            android:src="@drawable/logo_branding"
-            android:gravity="center_horizontal|bottom"
-            android:width="97dp"
-            android:height="24dp"
-            android:bottom="10%" /> <!-- Adjust 'bottom' to fine-tune (e.g., 5-15% for bias ~0.88) -->
+    <!-- Branding Logo: positioned at ~88% from top (bias 0.88) -->
+    <item
+        android:width="97dp"
+        android:height="24dp"
+        android:gravity="center_horizontal|top"
+        android:top="650dp">
+        <bitmap android:src="@drawable/logo_branding" />
     </item>
 </layer-list>
