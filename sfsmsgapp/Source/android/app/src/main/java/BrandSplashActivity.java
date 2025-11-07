@@ -11,14 +11,6 @@ public class BrandSplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        // Use the themes defined in your styles.xml
-        int nightModeFlags = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
-        if (nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
-            setTheme(R.style.LaunchTheme); // Use your LaunchTheme
-        } else {
-            setTheme(R.style.LaunchTheme); // Use your LaunchTheme (it should handle both light/dark)
-        }
 
         // Fullscreen
         getWindow().setFlags(
@@ -29,7 +21,7 @@ public class BrandSplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_brand_splash);
 
         // Auto dark mode
-        boolean isDark = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        boolean isDark = (getResources().getConfiguration().uiMode & 0x30) == 0x20;
         ((android.widget.ImageView) findViewById(R.id.logo_main)).setImageResource(
             isDark ? R.drawable.welcome_logo_light : R.drawable.welcome_logo
         );
@@ -37,11 +29,11 @@ public class BrandSplashActivity extends AppCompatActivity {
             isDark ? R.drawable.logo_branding_light : R.drawable.logo_branding
         );
 
-        // Extended duration - show native splash while Flutter loads data
+        // Short duration - just for branding, then let Flutter handle loading
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             startActivity(new Intent(this, MyFlutterActivity.class));
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            overridePendingTransition(0, 0);
             finish();
-        }, 3000); // Extended to 3 seconds to allow data loading
+        }, 1200); // Back to original 1200ms
     }
 }
