@@ -17,9 +17,9 @@ class SplashScreen extends StatelessWidget {
         : "assets/images/welcome_logo.png";
 
     // Dynamic colors
-    final buttonBg = isDark ? const Color(0xFFD1D1D1) : const Color(0xFF000000);
-    final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
-    final arrowColor = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+    final buttonBg = isDark ? const Color(0xFFD1D1D1) : const Color(0xFF242527);
+    final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFD1D1D1);
+    final arrowColor = isDark ? const Color(0xFF000000) : const Color(0xFFD1D1D1);
 
     return Scaffold(
       appBar: AppBar(
