@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // commons properties
 const xPrimaryColor = Color(0xFF5e72e4);
@@ -26,6 +27,8 @@ ThemeData appTheme({bool isDark = false, BuildContext? context}) {
     elevatedButtonTheme: elevatedButtonTheme(isDark: isDark, context: context),
     outlinedButtonTheme: outlinedButtonTheme(isDark: isDark, context: context),
     progressIndicatorTheme: progressIndicatorTheme(isDark: isDark, context: context),
+    // ADD SYSTEM UI OVERLAY STYLING FOR NAVIGATION BAR
+    useMaterial3: true,
   );
 }
 
@@ -43,6 +46,15 @@ AppBarTheme appBarTheme({bool isDark = false, BuildContext? context}) {
     iconTheme: IconThemeData(
       color: isDark ? xTextColorDark : xTextColor,
       size: 24,
+    ),
+    // ADD SYSTEM OVERLAY STYLE FOR STATUS BAR AND NAVIGATION BAR
+    systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // Transparent status bar
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: isDark ? xBackgroundColorDark : xBackgroundColor, // Navigation bar color
+      systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarDividerColor: Colors.transparent,
     ),
   );
 }
@@ -165,5 +177,19 @@ OutlinedButtonThemeData outlinedButtonTheme({bool isDark = false, BuildContext? 
 ProgressIndicatorThemeData progressIndicatorTheme({bool isDark = false, BuildContext? context}) {
   return ProgressIndicatorThemeData(
     color: xPrimaryColor,
+  );
+}
+
+// ADD THIS FUNCTION TO SET SYSTEM UI OVERLAY STYLE
+void setSystemUIOverlayStyle(bool isDark) {
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: isDark ? xBackgroundColorDark : xBackgroundColor,
+      systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
   );
 }
