@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="?android:colorBackground" />
 
-    <!-- Main Logo: positioned at ~38% from top (bias 0.38) -->
+    <!-- Main Logo - auto switch via drawable resource -->
     <item
         android:width="125dp"
         android:height="72dp"
@@ -11,7 +11,7 @@
         <bitmap android:src="@drawable/welcome_logo" />
     </item>
 
-    <!-- Branding Logo: positioned at ~88% from top (bias 0.88) -->
+    <!-- Branding Logo -->
     <item
         android:width="97dp"
         android:height="24dp"
