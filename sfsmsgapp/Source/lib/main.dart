@@ -9,7 +9,7 @@ import 'package:auto_route/auto_route.dart';
 // Import App Files
 import 'utilities/dev/http_overrides.dart';
 import 'common/themes.dart';
-import 'routes/router.gr.dart';
+import 'routes/router.dart'; // Import router.dart, not router.gr.dart twice
 import 'routes/router.gr.dart';
 import 'utilities/functions.dart';
 import 'screens/error/error_screen.dart';
