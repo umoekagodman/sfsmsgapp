@@ -56,29 +56,37 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(systemConfigProvider).when(
-          loading: () => LoadingScreen(),
-          error: (error, _) => ErrorScreen(message: error.toString()),
-          data: (_) {
-            final $system = ref.watch(systemProvider);
-            final $user = ref.watch(userProvider);
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              title: $system['system_title'],
-              theme: appTheme(context: context),
-              darkTheme: appTheme(context: context, isDark: true),
-              themeMode: ref.watch(appThemeModeProvider).value ?? ThemeMode.light,
-              localizationsDelegates: context.localizationDelegates,
-              supportedLocales: context.supportedLocales,
-              locale: context.locale,
-              routerDelegate: appRouter.delegate(
-                deepLinkBuilder: (_) => DeepLink(
-                  [$user.isNotEmpty ? goHome(ref, context: context, returnRoute: true) : const SplashRoute()],
-                ),
-              ),
-              routeInformationParser: appRouter.defaultRouteParser(),
-            );
-          },
+    // Go directly to splash screen without loading states
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'DM Messenger',
+      theme: appTheme(context: context),
+      darkTheme: appTheme(context: context, isDark: true),
+      themeMode: ref.watch(appThemeModeProvider).value ?? ThemeMode.light,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      routerDelegate: appRouter.delegate(
+        // Go directly to splash screen - remove all loading checks
+        initialDeepLink: '/splash',
+      ),
+      routeInformationParser: appRouter.defaultRouteParser(),
+      builder: (context, child) {
+        // Add system UI overlay styling for navigation bar
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
+            systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.dark 
+                ? Brightness.light 
+                : Brightness.dark,
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark 
+                ? Brightness.light 
+                : Brightness.dark,
+          ),
+          child: child!,
         );
+      },
+    );
   }
 }
