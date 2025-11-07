@@ -42,6 +42,6 @@ public class BrandSplashActivity extends AppCompatActivity {
             startActivity(new Intent(this, MyFlutterActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();
-        }, 3000); // Extended to 3 seconds to allow data loading
+        }, 5000);
     }
 }
