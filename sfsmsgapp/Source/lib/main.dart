@@ -13,7 +13,10 @@ import 'common/themes.dart';
 import 'routes/router.dart';
 import 'routes/router.gr.dart';
 import 'utilities/functions.dart';
+import 'screens/error/error_screen.dart';
+import 'screens/loading/loading_screen.dart';
 import 'states/apptheme_state.dart';
+import 'states/system_state.dart';
 
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides(); /* For Development Only */
@@ -63,32 +66,44 @@ class MyApp extends ConsumerWidget {
     // Set system UI overlay style
     setSystemUIOverlayStyle(isDark);
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'DM Messenger',
-      theme: appTheme(context: context, isDark: false),
-      darkTheme: appTheme(context: context, isDark: true),
-      themeMode: themeMode,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      routerDelegate: appRouter.delegate(
-        // Remove initialDeepLink to use the default initial route
-      ),
-      routeInformationParser: appRouter.defaultRouteParser(),
-      builder: (context, child) {
-        // Ensure system UI styling is applied to all screens
-        final currentIsDark = Theme.of(context).brightness == Brightness.dark;
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
-            systemNavigationBarColor: currentIsDark ? xBackgroundColorDark : xBackgroundColor,
-            systemNavigationBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
-          ),
-          child: child!,
+    return ref.watch(systemConfigProvider).when(
+          loading: () => LoadingScreen(), // Show loading while fetching system config
+          error: (error, _) => ErrorScreen(message: error.toString()),
+          data: (_) {
+            final $system = ref.watch(systemProvider);
+            final $user = ref.watch(userProvider);
+            
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              title: $system['system_title'],
+              theme: appTheme(context: context, isDark: false),
+              darkTheme: appTheme(context: context, isDark: true),
+              themeMode: themeMode,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+              routerDelegate: appRouter.delegate(
+                deepLinkBuilder: (_) => DeepLink(
+                  // Go to appropriate screen based on user state
+                  [$user.isNotEmpty ? goHome(ref, context: context, returnRoute: true) : const SplashRoute()],
+                ),
+              ),
+              routeInformationParser: appRouter.defaultRouteParser(),
+              builder: (context, child) {
+                // Ensure system UI styling is applied to all screens
+                final currentIsDark = Theme.of(context).brightness == Brightness.dark;
+                return AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: SystemUiOverlayStyle(
+                    statusBarColor: Colors.transparent,
+                    statusBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
+                    systemNavigationBarColor: currentIsDark ? xBackgroundColorDark : xBackgroundColor,
+                    systemNavigationBarIconBrightness: currentIsDark ? Brightness.light : Brightness.dark,
+                  ),
+                  child: child!,
+                );
+              },
+            );
+          },
         );
-      },
-    );
   }
 }
