@@ -7,27 +7,22 @@
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true">
 
-        <!-- 1. NATIVE SPLASH (WhatsApp style) -->
-        <activity
-            android:name=".BrandSplashActivity"
-            android:exported="true" 
-            android:theme="@style/LaunchTheme">  <!-- CHANGED THIS LINE -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-
-        <!-- 2. FLUTTER MAIN APP -->
+        <!-- ONLY FLUTTER ACTIVITY - No native splash -->
         <activity
             android:name=".MyFlutterActivity"
-            android:exported="false"
+            android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+
+            <!-- MAIN LAUNCHER INTENT FILTER -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
 
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
