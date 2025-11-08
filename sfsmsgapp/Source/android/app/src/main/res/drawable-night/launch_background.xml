@@ -9,8 +9,8 @@
             android:src="@drawable/welcome_logo_light" />
     </item>
     
-    <!-- Branding Logo at bottom (light version for dark mode) -->
-    <item android:top="80%">
+    <!-- Branding Logo at bottom (light version for dark mode) - use dp instead of percentage -->
+    <item android:top="600dp">
         <bitmap
             android:gravity="center"
             android:src="@drawable/logo_branding_light" />
