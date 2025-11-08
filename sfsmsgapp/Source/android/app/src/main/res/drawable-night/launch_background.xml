@@ -6,7 +6,7 @@
     <item
         android:width="125dp"
         android:height="72dp"
-        android:gravity="center">
+        android:gravity="center"> 
         <bitmap android:src="@drawable/welcome_logo_light" />
     </item>
 
