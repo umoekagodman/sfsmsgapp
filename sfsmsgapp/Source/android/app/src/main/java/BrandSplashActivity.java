@@ -10,10 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 public class BrandSplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Set theme BEFORE super.onCreate
+        setTheme(R.style.LaunchTheme);
         super.onCreate(savedInstanceState);
-
-        // Set the content view - THIS IS CRITICAL
-        setContentView(R.layout.activity_brand_splash);
 
         // Fullscreen
         getWindow().setFlags(
@@ -21,19 +20,7 @@ public class BrandSplashActivity extends AppCompatActivity {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         );
 
-        // Auto dark mode for images
-        boolean isDark = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-        
-        // Set appropriate logos based on dark/light mode
-        android.widget.ImageView logoMain = findViewById(R.id.logo_main);
-        android.widget.ImageView logoBranding = findViewById(R.id.logo_branding);
-        
-        logoMain.setImageResource(
-            isDark ? R.drawable.welcome_logo_light : R.drawable.welcome_logo
-        );
-        logoBranding.setImageResource(
-            isDark ? R.drawable.logo_branding_light : R.drawable.logo_branding
-        );
+        // NO setContentView() - we use the windowBackground from theme
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             startActivity(new Intent(this, MyFlutterActivity.class));
