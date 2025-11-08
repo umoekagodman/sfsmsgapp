@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" />
-    
+    <item android:drawable="#FFFFFFFF" /> <!-- White background -->
+
     <!-- Main Logo -->
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/welcome_logo" />
+    <item
+        android:width="125dp"
+        android:height="72dp"
+        android:gravity="center">
+        <bitmap android:src="@drawable/welcome_logo" />
     </item>
-    
-    <!-- Branding Logo at bottom - use dp instead of percentage -->
-    <item android:top="600dp">
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/logo_branding" />
+
+    <!-- Branding Logo -->
+    <item
+        android:width="97dp"
+        android:height="24dp"
+        android:gravity="bottom|center_horizontal"
+        android:bottom="100dp">
+        <bitmap android:src="@drawable/logo_branding" />
     </item>
 </layer-list>
