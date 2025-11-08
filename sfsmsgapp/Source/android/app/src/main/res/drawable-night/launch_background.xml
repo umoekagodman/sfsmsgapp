@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background_dark" />
+    
+    <item
+        android:width="125dp"
+        android:height="72dp"
+        android:gravity="center">
+        <bitmap android:src="@drawable/welcome_logo_light" />
+    </item>
+
+    <item
+        android:width="97dp"
+        android:height="24dp"
+        android:gravity="bottom|center"
+        android:bottom="100dp">
+        <bitmap android:src="@drawable/logo_branding_light" />
+    </item>
+</layer-list>
