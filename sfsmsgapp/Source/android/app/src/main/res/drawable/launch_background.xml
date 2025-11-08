@@ -2,23 +2,21 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/splash_background_light" />
 
-    <!-- Main Logo - 35% from top (vertical bias 0.35) -->
-    <item>
-        <bitmap
-            android:gravity="center_horizontal|top"
-            android:src="@drawable/welcome_logo"
-            android:width="125dp"
-            android:height="72dp"
-            android:top="35%" />
+    <!-- Main Logo - 35% from top (approx 250dp for most devices) -->
+    <item
+        android:width="125dp"
+        android:height="72dp"
+        android:gravity="center_horizontal|top"
+        android:top="250dp">
+        <bitmap android:src="@drawable/welcome_logo" />
     </item>
 
-    <!-- Branding Logo - 92% from top (vertical bias 0.92) -->
-    <item>
-        <bitmap
-            android:gravity="center_horizontal|bottom"
-            android:src="@drawable/logo_branding"
-            android:width="97dp"
-            android:height="24dp"
-            android:bottom="8%" />
+    <!-- Branding Logo - 92% from top (approx 650dp for most devices) -->
+    <item
+        android:width="97dp"
+        android:height="24dp"
+        android:gravity="center_horizontal|bottom"
+        android:bottom="100dp">
+        <bitmap android:src="@drawable/logo_branding" />
     </item>
 </layer-list>
