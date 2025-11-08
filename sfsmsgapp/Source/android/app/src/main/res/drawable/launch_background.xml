@@ -4,7 +4,7 @@
 
     <!-- Main Logo - 35% from top (approx 250dp for most devices) -->
     <item
-        android:width="125dp"
+        android:width="125dp" 
         android:height="72dp"
         android:gravity="center_horizontal|top"
         android:top="250dp">
