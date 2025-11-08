@@ -9,8 +9,8 @@
             android:src="@drawable/welcome_logo" />
     </item>
     
-    <!-- Branding Logo at bottom -->
-    <item android:top="80%">
+    <!-- Branding Logo at bottom - use dp instead of percentage -->
+    <item android:top="600dp">
         <bitmap
             android:gravity="center"
             android:src="@drawable/logo_branding" />
