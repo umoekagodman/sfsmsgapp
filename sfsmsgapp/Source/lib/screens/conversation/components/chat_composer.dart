@@ -125,34 +125,35 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     });
   }
 
-  // ──────────────────────────────────────────────────────────────
-  //  IMAGE PICK & UPLOAD
-  // ──────────────────────────────────────────────────────────────
-  Future<void> _pickImage() async {
-    setState(() {
-      _uploading = true;
-      _uploadProgress = 0.0;
-    });
+// ──────────────────────────────────────────────────────────────
+//  IMAGE PICK & UPLOAD  (lines ~110‑130)
+// ──────────────────────────────────────────────────────────────
+Future<void> _pickImage() async {
+  setState(() {
+    _uploading = true;
+    _uploadProgress = 0.0;
+  });
 
-    final picker = ImagePicker();
-    final xFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
-    if (xFile == null) {
-      setState(() => _uploading = false);
-      return;
-    }
-
-    final url = await uploadImage(
-      context: context,
-      file: xFile,
-      handle: 'x-image',
-      multiple: false,
-      setUploadingState: (b) => setState(() => _uploading = b),
-      onProgress: (p) => setState(() => _uploadProgress = p),
-    );
-
-    if (url != null) _imageUrl = url;
+  final picker = ImagePicker();
+  final xFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+  if (xFile == null) {
     setState(() => _uploading = false);
+    return;
   }
+
+  // <-- FIXED CALL – pass ALL required parameters
+  final url = await uploadImage(
+    context: context,                       // <-- required
+    file: xFile,
+    handle: 'x-image',
+    multiple: false,
+    setUploadingState: (b) => setState(() => _uploading = b),
+    onProgress: (p) => setState(() => _uploadProgress = p),
+  );
+
+  if (url != null) _imageUrl = url;
+  setState(() => _uploading = false);
+}
 
   // ──────────────────────────────────────────────────────────────
   //  BUILD
