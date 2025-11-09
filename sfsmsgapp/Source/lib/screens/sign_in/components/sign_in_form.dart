@@ -99,24 +99,63 @@ class _SignInFormState extends ConsumerState<SignInForm> {
           // Submit
           ElevatedButton(
             onPressed: () async {
-              if (isSubmitLoading) return;
-              if (formKey.currentState!.validate()) {
-                setState(() {
-                  isSubmitLoading = true;
-                });
-                // connect to the server
-                var deviceInfo = await getDeviceInfo();
-                final response = await sendAPIRequest(
-                  'auth/signin',
-                  method: 'POST',
-                  body: {
-                    "username_email": usernameEmailController.text,
-                    "password": passwordController.text,
-                    "device_name": deviceInfo['name'],
-                    "device_type": (Platform.isAndroid) ? "A" : "I",
-                    "device_os_version": deviceInfo['systemVersion'],
-                  },
-                );
+  if (isSubmitLoading) return;               // prevent double‑tap
+  if (!formKey.currentState!.validate()) return;
+
+  setState(() => isSubmitLoading = true);
+
+  try {
+    final deviceInfo = await getDeviceInfo();
+
+    final response = await sendAPIRequest(
+      'auth/signin',
+      method: 'POST',
+      body: {
+        "username_email": usernameEmailController.text.trim(),
+        "password": passwordController.text,
+        "device_name": deviceInfo['name'],
+        "device_type": Platform.isAndroid ? "A" : "I",
+        "device_os_version": deviceInfo['systemVersion'],
+      },
+    );
+
+    // ── ALWAYS reset loading first ──
+    if (!mounted) return;
+    setState(() => isSubmitLoading = false);
+
+    // ── SUCCESS PATH ──
+    if (response['statusCode'] == 200) {
+      final data = response['body']['data'];
+
+      if (data['2FA'] != null) {
+        context.router.push(TwoFactorAuthRoute(
+          userId: data['user_id'],
+          method: data['method'],
+        ));
+      } else {
+        await setSharedPref('x-auth-token', data['token']);
+        ref.read(userProvider.notifier).state = data['user'];
+        goHome(ref, context: context);
+      }
+      return;
+    }
+
+    // ── ERROR PATH – show message from server ──
+    final errorMsg = response['body']['message']?.toString() ?? tr("Invalid credentials");
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(snackBarError(errorMsg));
+
+  } catch (e) {
+    // ── NETWORK / UNEXPECTED ERROR ──
+    if (!mounted) return;
+    setState(() => isSubmitLoading = false);
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(snackBarError(tr("Something went wrong. Try again.")));
+  }
+},
                 setState(() {
                   isSubmitLoading = false;
                 });
