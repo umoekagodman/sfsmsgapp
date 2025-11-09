@@ -55,6 +55,8 @@ dev_dependencies:
   riverpod_lint: ^2.3.10
   logger: ^2.5.0
 
+  dio: ^5.4.0   # <-- add image upload progress support
+
   # ADD FLUTTER NATIVE SPLASH
   flutter_native_splash: ^2.3.1
 
