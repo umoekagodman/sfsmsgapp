@@ -147,7 +147,7 @@ Future<void> _pickImage() async {
     handle: 'x-image',
     multiple: false,
     setUploadingState: (b) => setState(() => _uploading = b),
-    onProgress: (p) => setState(() => _uploadProgress = p),   // ← progress
+    onProgress: (p) => setState(() => _uploadProgress = p),
   );
 
   if (url != null) _imageUrl = url;
