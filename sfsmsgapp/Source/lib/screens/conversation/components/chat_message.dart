@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../../common/themes.dart';
-import '../../../states/system_state.dart';
+import '../../../states/system_state.dart'; 
 import '../../../utilities/functions.dart';
 import '../../../widgets/profile_avatar.dart';
 
