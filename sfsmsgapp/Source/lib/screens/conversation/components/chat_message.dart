@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-
-// Third-party
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:voice_message_package/voice_message_package.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:flutter_html/flutter_html.dart';          // <-- NEW
+import 'package:flutter_html/flutter_html.dart';
+import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-// App files
 import '../../../common/themes.dart';
 import '../../../states/system_state.dart';
 import '../../../utilities/functions.dart';
-import '../../../utilities/timeago_locale/timeago_locale.dart';
 import '../../../widgets/profile_avatar.dart';
 
 class ChatMessage extends ConsumerWidget {
@@ -27,235 +23,184 @@ class ChatMessage extends ConsumerWidget {
     required this.isMultipleRecipients,
   });
 
+  // WhatsApp exact timestamp: 14:32 or Today 14:32
+  String _formatTime(BuildContext context, DateTime dt) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final date = DateTime(dt.year, dt.month, dt.day);
+
+    if (date == today) {
+      return DateFormat('HH:mm').format(dt);
+    } else if (date == yesterday) {
+      return '${tr('Yesterday')} ${DateFormat('HH:mm').format(dt)}';
+    } else {
+      return DateFormat('dd/MM HH:mm').format(dt);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final $system = ref.read(systemProvider);
-    final languageCode = Localizations.localeOf(context).languageCode;
-    setLocaleMessagesForLocale(languageCode);
-
-    final double avatarRadius = 20;
-    final double avatarDiameter = avatarRadius * 2;
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final time = convertedTime(message['time']);
+    final bubbleColor = isCurrentUser
+        ? xPrimaryColor
+        : (dark ? const Color(0xFF2A2A2A) : const Color(0xFFE1FFC7));
+    final textColor = isCurrentUser ? Colors.white : (dark ? Colors.white70 : Colors.black87);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Column(
-        crossAxisAlignment:
-            isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          // ---------- GROUP: SENDER NAME ----------
+          // Group name
           if (!isCurrentUser && isMultipleRecipients)
             Padding(
-              padding: EdgeInsets.only(
-                bottom: 2.0,
-                left: avatarDiameter + 10,
-              ),
+              padding: const EdgeInsets.only(left: 50, bottom: 2),
               child: Text(
-                message['user_fullname'],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: isDark ? Colors.white70 : Colors.black87,
-                ),
+                message['user_fullname'] ?? '',
+                style: TextStyle(fontSize: 12, color: xPrimaryColor, fontWeight: FontWeight.w600),
               ),
             ),
 
-          // ---------- MAIN ROW ----------
           Row(
-            mainAxisAlignment:
-                isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // Avatar (left side only)
               if (!isCurrentUser)
                 Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: ProfileAvatar(
-                    imageUrl: message['user_picture'],
-                    radius: avatarRadius,
-                  ),
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ProfileAvatar(imageUrl: message['user_picture'], radius: 18),
                 ),
 
-              // ---------- BUBBLE ----------
+              // Bubble
               Flexible(
-                child: Column(
-                  crossAxisAlignment:
-                      isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
-                    // ---- TEXT (HTML) ---
-if (message['message'].isNotEmpty)
-  Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-    decoration: BoxDecoration(
-      color: isCurrentUser
-          ? xPrimaryColor
-          : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
-      borderRadius: BorderRadius.circular(18),
-    ),
-    child: Html(  // ← FIXED: Html, not FlutterHtml
-      data: message['message'],
-      style: {
-        "body": Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          fontSize: FontSize(16),
-          color: isCurrentUser
-              ? Colors.white
-              : (isDark ? Colors.white70 : Colors.black87),
-          lineHeight: const LineHeight(1.4),
-        ),
-        "br": Style(display: Display.block),
-      },
-    ),
-  ),
-
-                    // ---- IMAGE ----
-                    if (message['image'].isNotEmpty)
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: message['message'].isNotEmpty ? 5 : 0),
-                        child: GestureDetector(
-                          onTap: () => _showImageFullScreen(context, $system, message),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Image.network(
-                              "${$system['system_uploads']}/${message['image']}",
-                              width: 200,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const Icon(Icons.error),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    // ---- VOICE NOTE ----
-                    if (message['voice_note'].isNotEmpty)
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: message['message'].isNotEmpty ? 5 : 0),
-                        child: VoiceMessageView(
-                          controller: VoiceController(
-                            audioSrc:
-                                "${$system['system_uploads']}/${message['voice_note']}",
-                            maxDuration: Duration(
-                                seconds: int.parse(
-                                    $system['voice_notes_durtaion'] ?? '60')),
-                            isFile: false,
-                            // Required callbacks (empty is fine)
-                            onComplete: () {},
-                            onPause: () {},
-                            onPlaying: () {},
-                          ),
-                          innerPadding: 12,
-                          cornerRadius: 18,
-                          backgroundColor: isCurrentUser
-                              ? xPrimaryColor
-                              : (isDark
-                                  ? const Color(0xFF3a3b3b)
-                                  : Colors.grey.shade200),
-                          activeSliderColor:
-                              isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
-                          circlesColor: isCurrentUser
-                              ? xPrimaryColor
-                              : (isDark
-                                  ? const Color(0xFF3a3b3b)
-                                  : Colors.grey.shade200),
-                          playIcon: Icon(Icons.play_arrow_rounded,
-                              color: isCurrentUser
-                                  ? Colors.white
-                                  : (isDark ? Colors.white : Colors.black)),
-                          pauseIcon: Icon(Icons.pause_rounded,
-                              color: isCurrentUser
-                                  ? Colors.white
-                                  : (isDark ? Colors.white : Colors.black)),
-                          size: 40,
-                          counterTextStyle: TextStyle(
-                            color: isCurrentUser
-                                ? Colors.white
-                                : (isDark ? Colors.white : Colors.black),
-                            fontSize: 10,
-                          ),
-                          circlesTextStyle: TextStyle(
-                            color: isCurrentUser
-                                ? Colors.white
-                                : (isDark ? Colors.white : Colors.black),
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                    // ---- TIMESTAMP ----
-                    Container(
-                      margin: const EdgeInsets.only(top: 5),
-                      child: Text(
-                        timeago.format(convertedTime(message['time']),
-                            locale: languageCode),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isDark ? Colors.white60 : Colors.grey[600],
-                        ),
+                child: IntrinsicWidth(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 280),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: bubbleColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(18),
+                        topRight: const Radius.circular(18),
+                        bottomLeft: isCurrentUser ? const Radius.circular(18) : const Radius.circular(4),
+                        bottomRight: isCurrentUser ? const Radius.circular(4) : const Radius.circular(18),
                       ),
                     ),
-                  ],
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Text
+                              if (message['message']?.toString().isNotEmpty == true)
+                                SelectionArea(
+                                  child: Html(
+                                    data: message['message'],
+                                    style: {
+                                      "body": Style(
+                                        margin: Margins.zero,
+                                        padding: HtmlPaddings.zero,
+                                        fontSize: FontSize(15.5),
+                                        color: textColor,
+                                        lineHeight: const LineHeight(1.35),
+                                      ),
+                                    },
+                                  ),
+                                ),
+
+                              // Image
+                              if (message['image']?.toString().isNotEmpty == true)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => Scaffold(
+                                            backgroundColor: Colors.black,
+                                            body: PhotoView(
+                                              imageProvider: NetworkImage("${$system['system_uploads']}/${message['image']}"),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      child: Image.network(
+                                        "${$system['system_uploads']}/${message['image']}",
+                                        width: 200,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                              // Voice note
+                              if (message['voice_note']?.toString().isNotEmpty == true)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: VoiceMessageView(
+                                    controller: VoiceController(
+                                      audioSrc: "${$system['system_uploads']}/${message['voice_note']}",
+                                      maxDuration: const Duration(seconds: 180),
+                                      isFile: false,
+                                      onComplete: () {},
+                                      onPause: () {},
+                                      onPlaying: () {},
+                                    ),
+                                    cornerRadius: 20,
+                                    backgroundColor: bubbleColor,
+                                    activeSliderColor: Colors.white,
+                                    circlesColor: bubbleColor,
+                                    size: 38,
+                                    innerPadding: 8,
+                                    counterTextStyle: TextStyle(color: textColor, fontSize: 10),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+
+                        // Timestamp + checkmarks
+                        Positioned(
+                          bottom: 2,
+                          right: 6,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _formatTime(context, time),
+                                style: TextStyle(fontSize: 11, color: textColor.withOpacity(0.8)),
+                              ),
+                              if (isCurrentUser) ...[
+                                const SizedBox(width: 4),
+                                Icon(
+                                  message['seen'] == true ? Icons.done_all : Icons.done,
+                                  size: 14,
+                                  color: message['seen'] == true ? Colors.cyanAccent : textColor.withOpacity(0.8),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
+
+              if (isCurrentUser)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: ProfileAvatar(imageUrl: message['user_picture'], radius: 18),
+                ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  // --------------------------------------------------------------
-  // Helper: Full-screen image viewer
-  // --------------------------------------------------------------
-  void _showImageFullScreen(
-      BuildContext context, Map<String, dynamic> system, Map<String, dynamic> msg) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.75),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: PhotoView(
-                imageProvider:
-                    NetworkImage("${system['system_uploads']}/${msg['image']}"),
-                backgroundDecoration: const BoxDecoration(color: Colors.transparent),
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered * 2,
-              ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: IconButton(
-                icon: const Icon(Icons.download, color: Colors.white),
-                onPressed: () async {
-                  final saved = await saveImageToGallery(
-                      "${system['system_uploads']}/${msg['image']}");
-                  if (saved) showSavedOverlay(context);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-            Positioned(
-              top: 10,
-              left: 10,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
