@@ -116,7 +116,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       setState(() => _uploading = false);
       return;
     }
-    final url = await uploadImage(File(xFile.path), onProgress: (p) => setState(() {}));
+    final url = await uploadImage(
+  file: File(xFile.path),
+  onProgress: (p) => setState(() {}),   // optional, can be omitted
+);
     if (url != null) _imageUrl = url;
     setState(() => _uploading = false);
   }
@@ -227,7 +230,10 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     },
                     onLongPressEnd: (_) async {
                       if (_locked) return;
-                      final url = await VoiceRecorder().stopRecording(context: context);
+                      final url = await VoiceRecorder().stopRecording(
+  context: context,
+  setRecordingState: (recording) => setState(() => _recording = recording),
+);
                       if (url != null) {
                         _voiceUrl = url;
                         _send();
