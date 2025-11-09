@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -40,13 +40,17 @@ class ChatComposer extends ConsumerStatefulWidget {
 class _ChatComposerState extends ConsumerState<ChatComposer> {
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
+
   Timer? _typingTimer;
   bool _isTyping = false;
+
   String _imageUrl = '';
   bool _uploading = false;
+  double _uploadProgress = 0.0;   // <-- NEW
+
   String _voiceUrl = '';
   bool _recording = false;
-  bool _locked = false; // WhatsApp “slide to cancel” lock
+  bool _locked = false;          // for future “slide‑to‑cancel” lock
 
   @override
   void dispose() {
@@ -56,30 +60,25 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     super.dispose();
   }
 
-  void _reset() {
-    setState(() {
-      _textController.clear();
-      _isTyping = false;
-      _imageUrl = '';
-      _uploading = false;
-      _voiceUrl = '';
-      _recording = false;
-      _locked = false;
-    });
-  }
-
+  // ──────────────────────────────────────────────────────────────
+  //  SEND MESSAGE
+  // ──────────────────────────────────────────────────────────────
   Future<void> _send() async {
     final text = _textController.text.trim();
     if (text.isEmpty && _imageUrl.isEmpty && _voiceUrl.isEmpty) return;
 
-    final body = {
+    final body = <String, dynamic>{
       if (text.isNotEmpty) 'message': text,
       if (_imageUrl.isNotEmpty) 'photo': _imageUrl,
       if (_voiceUrl.isNotEmpty) 'voice_note': _voiceUrl,
-      if (widget.conversation != null) 'conversation_id': widget.conversation!['conversation_id'],
+      if (widget.conversation != null)
+        'conversation_id': widget.conversation!['conversation_id'],
       if (widget.user != null) 'recipients': [widget.user!['user_id']].toString(),
       if (widget.selectedContacts != null)
-        'recipients': widget.selectedContacts!.map((e) => e['user_id']).toList().toString(),
+        'recipients': widget.selectedContacts!
+            .map((e) => e['user_id'])
+            .toList()
+            .toString(),
     };
 
     final resp = await sendAPIRequest('chat/message', method: 'POST', body: body);
@@ -88,10 +87,28 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       widget.onSendMessage?.call(resp['body']['data']);
       _reset();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(snackBarWarning(resp['body']['message'] ?? tr("Error")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        snackBarWarning(resp['body']['message'] ?? tr('Error')),
+      );
     }
   }
 
+  void _reset() {
+    setState(() {
+      _textController.clear();
+      _isTyping = false;
+      _imageUrl = '';
+      _uploading = false;
+      _uploadProgress = 0.0;
+      _voiceUrl = '';
+      _recording = false;
+      _locked = false;
+    });
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  //  TYPING INDICATOR
+  // ──────────────────────────────────────────────────────────────
   void _onTyping(String v) {
     final typing = v.trim().isNotEmpty;
     if (typing == _isTyping) return;
@@ -108,19 +125,38 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     });
   }
 
+  // ──────────────────────────────────────────────────────────────
+  //  IMAGE PICK & UPLOAD
+  // ──────────────────────────────────────────────────────────────
   Future<void> _pickImage() async {
-    setState(() => _uploading = true);
+    setState(() {
+      _uploading = true;
+      _uploadProgress = 0.0;
+    });
+
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     if (xFile == null) {
       setState(() => _uploading = false);
       return;
     }
-    final url = await uploadImage(file: File(xFile.path));
+
+    final url = await uploadImage(
+      context: context,
+      file: xFile,
+      handle: 'x-image',
+      multiple: false,
+      setUploadingState: (b) => setState(() => _uploading = b),
+      onProgress: (p) => setState(() => _uploadProgress = p),
+    );
+
     if (url != null) _imageUrl = url;
     setState(() => _uploading = false);
   }
 
+  // ──────────────────────────────────────────────────────────────
+  //  BUILD
+  // ──────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final $system = ref.read(systemProvider);
@@ -133,18 +169,18 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       padding: EdgeInsets.only(
         left: 8,
         right: 8,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
         top: 8,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
       ),
       child: Row(
         children: [
-          // Emoji button (Telegram style)
+          // ── Emoji ──
           IconButton(
             icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey[600]),
             onPressed: () {},
           ),
 
-          // Image preview OR attach button
+          // ── Image preview / attach / progress ──
           if (_imageUrl.isNotEmpty)
             Stack(
               children: [
@@ -170,7 +206,20 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 ),
               ],
             )
-          else if (!_uploading)
+          else if (_uploading)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  value: _uploadProgress > 0 ? _uploadProgress : null,
+                  strokeWidth: 2.5,
+                  color: xPrimaryColor,
+                ),
+              ),
+            )
+          else
             IconButton(
               icon: SvgPicture.asset(
                 "assets/images/icons/chat/image.svg",
@@ -179,14 +228,9 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                 colorFilter: const ColorFilter.mode(xPrimaryColor, BlendMode.srcIn),
               ),
               onPressed: _pickImage,
-            )
-          else
-            const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: SpinKitCircle(color: xPrimaryColor, size: 24),
             ),
 
-          // Text field + voice button inside
+          // ── Text field + mic/send inside ──
           Expanded(
             child: Container(
               constraints: const BoxConstraints(maxHeight: 140),
@@ -202,8 +246,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                       focusNode: _focusNode,
                       minLines: 1,
                       maxLines: 5,
-                      textInputAction: TextInputAction.newline,
                       keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
                       style: TextStyle(fontSize: 16, color: dark ? Colors.white : Colors.black87),
                       decoration: InputDecoration(
                         hintText: tr('Speak your mind...'),
@@ -215,7 +259,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     ),
                   ),
 
-                  // Voice / Send button
+                  // ── Voice / Send button ──
                   GestureDetector(
                     onLongPressStart: (_) async {
                       if (_locked) return;
@@ -228,23 +272,27 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                     onLongPressEnd: (_) async {
                       if (_locked) return;
                       final url = await VoiceRecorder().stopRecording(
-  context: context,
-  setRecordingState: (recording) => setState(() => _recording = recording),
-);
+                        context: context,
+                        setRecordingState: (r) => setState(() => _recording = r),
+                      );
                       if (url != null) {
                         _voiceUrl = url;
-                        _send();
+                        await _send();
                       }
                       setState(() => _recording = false);
                     },
                     child: CircleAvatar(
                       radius: 20,
-                      backgroundColor: _textController.text.isNotEmpty || _imageUrl.isNotEmpty ? xPrimaryColor : Colors.transparent,
+                      backgroundColor: _textController.text.isNotEmpty || _imageUrl.isNotEmpty
+                          ? xPrimaryColor
+                          : Colors.transparent,
                       child: Icon(
                         _textController.text.isNotEmpty || _imageUrl.isNotEmpty
                             ? Icons.send_rounded
                             : (_recording ? Icons.mic : Icons.mic_none),
-                        color: _textController.text.isNotEmpty || _imageUrl.isNotEmpty ? Colors.white : Colors.grey[600],
+                        color: _textController.text.isNotEmpty || _imageUrl.isNotEmpty
+                            ? Colors.white
+                            : Colors.grey[600],
                         size: 22,
                       ),
                     ),
