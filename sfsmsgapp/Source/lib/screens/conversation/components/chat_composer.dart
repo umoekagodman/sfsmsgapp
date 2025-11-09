@@ -116,10 +116,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
       setState(() => _uploading = false);
       return;
     }
-    final url = await uploadImage(
-  file: File(xFile.path),
-  onProgress: (p) => setState(() {}),   // optional, can be omitted
-);
+    final url = await uploadImage(file: File(xFile.path));
     if (url != null) _imageUrl = url;
     setState(() => _uploading = false);
   }
