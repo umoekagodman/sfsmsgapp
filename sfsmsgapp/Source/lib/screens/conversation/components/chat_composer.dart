@@ -141,14 +141,13 @@ Future<void> _pickImage() async {
     return;
   }
 
-  // <-- FIXED CALL – pass ALL required parameters
   final url = await uploadImage(
-    context: context,                       // <-- required
+    context: context,
     file: xFile,
     handle: 'x-image',
     multiple: false,
     setUploadingState: (b) => setState(() => _uploading = b),
-    onProgress: (p) => setState(() => _uploadProgress = p),
+    onProgress: (p) => setState(() => _uploadProgress = p),   // ← progress
   );
 
   if (url != null) _imageUrl = url;
