@@ -15,7 +15,7 @@ Future<String?> showImageUploadOptions({
   String handle = 'x-image',
   bool multiple = false,
   required Function(bool) setUploadingState,
-  void Function(double)? onProgress,   // ← NEW: optional progress
+  void Function(double)? onProgress,
 }) async {
   final source = await showModalBottomSheet<ImageSource>(
     shape: const RoundedRectangleBorder(
@@ -60,7 +60,7 @@ Future<String?> showImageUploadOptions({
 }
 
 /// ---------------------------------------------------------------
-///  UPLOAD USING YOUR EXISTING sendAPIRequest() + PROGRESS
+///  UPLOAD WITH PROGRESS
 /// ---------------------------------------------------------------
 Future<String?> uploadImage({
   required BuildContext context,
@@ -68,7 +68,7 @@ Future<String?> uploadImage({
   String? handle,
   bool? multiple,
   required Function(bool) setUploadingState,
-  void Function(double)? onProgress,   // 0.0 → 1.0
+  void Function(double)? onProgress,
 }) async {
   setUploadingState(true);
 
