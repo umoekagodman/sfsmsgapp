@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -16,6 +15,7 @@ Future<String?> showImageUploadOptions({
   String handle = 'x-image',
   bool multiple = false,
   required Function(bool) setUploadingState,
+  void Function(double)? onProgress,   // ← NEW: optional progress
 }) async {
   final source = await showModalBottomSheet<ImageSource>(
     shape: const RoundedRectangleBorder(
@@ -55,11 +55,12 @@ Future<String?> showImageUploadOptions({
     handle: handle,
     multiple: multiple,
     setUploadingState: setUploadingState,
+    onProgress: onProgress,
   );
 }
 
 /// ---------------------------------------------------------------
-///  UPLOAD WITH REAL‑TIME PROGRESS
+///  UPLOAD USING YOUR EXISTING sendAPIRequest() + PROGRESS
 /// ---------------------------------------------------------------
 Future<String?> uploadImage({
   required BuildContext context,
@@ -72,19 +73,17 @@ Future<String?> uploadImage({
   setUploadingState(true);
 
   try {
-    final dio = Dio();
-    final form = FormData.fromMap({
-      'type': 'photos',
-      'handle': handle ?? 'x-image',
-      'multiple': (multiple ?? false).toString(),
-      'name': file.name,
-      'guid': getGUID(),
-      'file': await MultipartFile.fromFile(file.path),
-    });
-
-    final response = await dio.post(
-      '${getBaseUrl()}/data/upload',   // <-- adjust if your endpoint differs
-      data: form,
+    final response = await sendAPIRequest(
+      'data/upload',
+      method: 'UPLOAD',
+      body: <String, String>{
+        'type': 'photos',
+        'handle': handle ?? 'x-image',
+        'multiple': (multiple ?? false).toString(),
+        'name': file.name,
+        'guid': getGUID(),
+      },
+      files: [file.path],
       onSendProgress: (sent, total) {
         if (total > 0 && onProgress != null) {
           onProgress(sent / total);
@@ -92,10 +91,10 @@ Future<String?> uploadImage({
       },
     );
 
-    if (response.statusCode == 200 && response.data['data'] != null) {
-      return response.data['data'] as String;
+    if (response['statusCode'] == 200) {
+      return response['body']['data'];
     } else {
-      throw Exception(response.data['message'] ?? 'Upload failed');
+      throw Exception(response['body']['message'] ?? 'Upload failed');
     }
   } catch (e) {
     ScaffoldMessenger.of(context)
