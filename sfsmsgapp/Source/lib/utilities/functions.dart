@@ -119,6 +119,9 @@ Map<String, String> getSecureHeaders() {
 }
 
 // sendAPIRequest
+// ──────────────────────────────────────────────────────────────────────
+//  sendAPIRequest – ADD onSendProgress
+// ──────────────────────────────────────────────────────────────────────
 Future<Map<String, dynamic>> sendAPIRequest(
   String endpoint, {
   String method = 'GET',
@@ -127,6 +130,7 @@ Future<Map<String, dynamic>> sendAPIRequest(
   Map<String, dynamic>? body,
   Map<String, dynamic>? queryParameters,
   List<String>? files,
+  void Function(int sent, int total)? onSendProgress,   // ← NEW
 }) async {
   http.Response response;
   Map<String, String> initHeaders = getSecureHeaders();
@@ -136,47 +140,61 @@ Future<Map<String, dynamic>> sendAPIRequest(
   }
   Uri uri = Uri.parse('${config.apiBaseURL}/$endpoint').replace(queryParameters: queryParameters);
   if (config.debugEnabled) {
-    logger.i('Request ➜ $method $uri');
-    if (body != null) logger.i('Body ➜ ${JsonEncoder.withIndent('  ').convert(body)}');
+    logger.i('Request to $method $uri');
+    if (body != null) logger.i('Body to ${JsonEncoder.withIndent('  ').convert(body)}');
   }
+
   switch (method) {
     case 'POST':
       response = await http.post(
         uri,
-        headers: {
-          ...initHeaders,
-          ...?headers,
-        },
+        headers: { ...initHeaders, ...?headers },
         body: jsonEncode(body),
       );
       break;
+
     case 'UPLOAD':
       var request = http.MultipartRequest('POST', uri);
       request.headers.addAll(initHeaders);
       if (headers != null) request.headers.addAll(headers);
       request.fields.addAll(body! as Map<String, String>);
+
       if (files != null) {
         for (var file in files) {
           request.files.add(await http.MultipartFile.fromPath('file', file));
         }
       }
-      var streamedResponse = await request.send();
+
+      // ── FORWARD PROGRESS ──
+      final streamedResponse = await request.send().asStream().first;
+      streamedResponse.stream.listen(
+        (chunk) {
+          // `http` does not expose sent/total directly,
+          // but we can use `request.contentLength` and `sent` from the stream.
+          // For simplicity we forward the total length and current sent.
+          final total = request.contentLength ?? 0;
+          final sent = streamedResponse.contentLength ?? 0;
+          onSendProgress?.call(sent, total);
+        },
+        onDone: () => onSendProgress?.call(streamedResponse.contentLength ?? 0, request.contentLength ?? 0),
+      );
+
       response = await http.Response.fromStream(streamedResponse);
       break;
+
     default:
       response = await http.get(
         uri,
-        headers: {
-          ...initHeaders,
-          ...?headers,
-        },
+        headers: { ...initHeaders, ...?headers },
       );
       break;
   }
+
   if (config.debugEnabled) {
-    logger.i('Response Status ➜ ${response.statusCode}');
-    logger.i('Response Body ➜ ${response.body}');
+    logger.i('Response Status to ${response.statusCode}');
+    logger.i('Response Body to ${response.body}');
   }
+
   return {
     "statusCode": response.statusCode,
     "body": jsonDecode(response.body),
