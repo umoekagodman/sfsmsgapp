@@ -139,7 +139,8 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final inputBg = isDark ? const Color(0xFF2A2A2A) : Colors.white;
     final hintColor = isDark ? Colors.grey[400] : Colors.grey[600];
-    final borderColor = isDark ? Colors.grey[700] : Colors.grey[300];
+    // FIX: Provide non-null default colors
+    final borderColor = isDark ? Colors.grey[700]! : Colors.grey[300]!;
 
     final bool hasText = _textController.text.trim().isNotEmpty;
     final bool showSendButton = hasText || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty;
