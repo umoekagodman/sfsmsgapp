@@ -399,24 +399,21 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
                               TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
                           // Custom context menu: best-effort 'Clipboard' picker
                           contextMenuBuilder: (context, editableTextState) {
-                            // default menu items (cut/copy/paste/selectAll) plus "Clipboard" option
-                            final items = AdaptiveTextSelectionToolbar.buttonItems(
-                              anchors: editableTextState.contextMenuAnchors,
-                            );
-                            return AdaptiveTextSelectionToolbar(
-                              anchors: editableTextState.contextMenuAnchors,
-                              children: [
-                                ...items,
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    _showClipboardPicker();
-                                  },
-                                  child: Text(tr('Clipboard')),
-                                )
-                              ],
-                            );
-                          },
+  final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
+  return AdaptiveTextSelectionToolbar.buttonItems(
+    anchors: editableTextState.contextMenuAnchors,
+    buttonItems: [
+      ...buttonItems,
+      ContextMenuButtonItem(
+        label: tr('Clipboard'),
+        onPressed: () {
+          editableTextState.hideToolbar();
+          _showClipboardPicker();
+        },
+      ),
+    ],
+  );
+},
                         ),
                       ),
                     ),
