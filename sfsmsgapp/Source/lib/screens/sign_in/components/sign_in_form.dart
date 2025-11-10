@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
 // Import Third Party Packages
-import 'package:auto_route/auto_route.dart';
+import 'package:auto_route/auto_route.dart'; 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
