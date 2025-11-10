@@ -6,7 +6,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/intl.dart';
-
+ 
 import '../../../common/themes.dart';
 import '../../../states/system_state.dart';
 import '../../../utilities/functions.dart';
