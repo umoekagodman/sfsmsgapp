@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../../common/themes.dart';
@@ -18,7 +16,7 @@ import '../../../widgets/timer.dart';
 class ChatComposer extends ConsumerStatefulWidget {
   final String? conversationId;
   final Map<String, dynamic>? conversation;
-  final Map<String, dynamic>? user;
+  final Map<String, dynamic>? user; 
   final List<dynamic>? selectedContacts;
   final Function(Map<String, dynamic>)? onSendMessage;
   final Function(Map<String, dynamic>)? onNewMessage;
@@ -40,17 +38,92 @@ class ChatComposer extends ConsumerStatefulWidget {
 class _ChatComposerState extends ConsumerState<ChatComposer> {
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
-
   Timer? _typingTimer;
   bool _isTyping = false;
-
   String _imageUrl = '';
-  bool _uploading = false;
-  double _uploadProgress = 0.0;   // <-- NEW
+  bool _uploadingImage = false;
+  String _voiceNoteUrl = '';
+  bool _isRecording = false;
+  bool _showEmoji = false;
 
-  String _voiceUrl = '';
-  bool _recording = false;
-  bool _locked = false;          // for future “slide‑to‑cancel” lock
+  // Send message
+  Future<void> _sendMessage() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty && _imageUrl.isEmpty && _voiceNoteUrl.isEmpty) return;
+
+    final response = await sendAPIRequest(
+      'chat/message',
+      method: 'POST',
+      body: {
+        if (text.isNotEmpty) 'message': text,
+        if (_imageUrl.isNotEmpty) 'photo': _imageUrl,
+        if (_voiceNoteUrl.isNotEmpty) 'voice_note': _voiceNoteUrl,
+        if (widget.conversation != null && widget.conversation!.isNotEmpty)
+          'conversation_id': widget.conversation!['conversation_id'],
+        if ((widget.conversation == null || widget.conversation!.isEmpty) && widget.user != null)
+          'recipients': [widget.user!['user_id']].toString(),
+        if (widget.selectedContacts != null && widget.selectedContacts!.isNotEmpty)
+          'recipients': widget.selectedContacts!.map((e) => e['user_id']).toList().toString(),
+      },
+    );
+
+    if (response['statusCode'] == 200 && response['body']['data'] is Map) {
+      widget.onNewMessage?.call(response['body']['data']);
+      widget.onSendMessage?.call(response['body']['data']);
+      _resetInput();
+    } else {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(snackBarWarning(response['body']['message'] ?? tr("There is something that went wrong!")));
+    }
+  }
+
+  void _resetInput() {
+    setState(() {
+      _textController.clear();
+      _isTyping = false;
+      _imageUrl = '';
+      _uploadingImage = false;
+      _voiceNoteUrl = '';
+      _isRecording = false;
+      _showEmoji = false;
+    });
+  }
+
+  // Typing indicator
+  void _handleTyping(String value) {
+    final wasTyping = _isTyping;
+    _isTyping = value.trim().isNotEmpty;
+
+    if (_isTyping != wasTyping) {
+      _typingTimer?.cancel();
+      _typingTimer = Timer(const Duration(milliseconds: 500), () {
+        _updateTypingStatus(_isTyping);
+      });
+    }
+  }
+
+  Future<void> _updateTypingStatus(bool typing) async {
+    final $system = ref.read(systemProvider);
+    if (!isTrue($system['chat_typing_enabled'])) return;
+    if (widget.conversation == null || widget.conversation!.isEmpty) return;
+
+    await sendAPIRequest(
+      'chat/reactions/typing',
+      method: 'POST',
+      body: {
+        'is_typing': typing,
+        'conversation_id': widget.conversation!['conversation_id'],
+      },
+    );
+  }
+
+  // Delete uploaded image
+  Future<void> _deleteImage() async {
+    final src = _imageUrl;
+    setState(() => _imageUrl = '');
+    await sendAPIRequest('data/delete', method: 'POST', body: {'src': src});
+  }
 
   @override
   void dispose() {
@@ -60,250 +133,213 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
     super.dispose();
   }
 
-  // ──────────────────────────────────────────────────────────────
-  //  SEND MESSAGE
-  // ──────────────────────────────────────────────────────────────
-  Future<void> _send() async {
-    final text = _textController.text.trim();
-    if (text.isEmpty && _imageUrl.isEmpty && _voiceUrl.isEmpty) return;
-
-    final body = <String, dynamic>{
-      if (text.isNotEmpty) 'message': text,
-      if (_imageUrl.isNotEmpty) 'photo': _imageUrl,
-      if (_voiceUrl.isNotEmpty) 'voice_note': _voiceUrl,
-      if (widget.conversation != null)
-        'conversation_id': widget.conversation!['conversation_id'],
-      if (widget.user != null) 'recipients': [widget.user!['user_id']].toString(),
-      if (widget.selectedContacts != null)
-        'recipients': widget.selectedContacts!
-            .map((e) => e['user_id'])
-            .toList()
-            .toString(),
-    };
-
-    final resp = await sendAPIRequest('chat/message', method: 'POST', body: body);
-    if (resp['statusCode'] == 200) {
-      widget.onNewMessage?.call(resp['body']['data']);
-      widget.onSendMessage?.call(resp['body']['data']);
-      _reset();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        snackBarWarning(resp['body']['message'] ?? tr('Error')),
-      );
-    }
-  }
-
-  void _reset() {
-    setState(() {
-      _textController.clear();
-      _isTyping = false;
-      _imageUrl = '';
-      _uploading = false;
-      _uploadProgress = 0.0;
-      _voiceUrl = '';
-      _recording = false;
-      _locked = false;
-    });
-  }
-
-  // ──────────────────────────────────────────────────────────────
-  //  TYPING INDICATOR
-  // ──────────────────────────────────────────────────────────────
-  void _onTyping(String v) {
-    final typing = v.trim().isNotEmpty;
-    if (typing == _isTyping) return;
-    _isTyping = typing;
-    _typingTimer?.cancel();
-    _typingTimer = Timer(const Duration(milliseconds: 800), () => _updateTyping(typing));
-  }
-
-  Future<void> _updateTyping(bool typing) async {
-    if (widget.conversation == null) return;
-    await sendAPIRequest('chat/reactions/typing', method: 'POST', body: {
-      'is_typing': typing,
-      'conversation_id': widget.conversation!['conversation_id'],
-    });
-  }
-
-// ──────────────────────────────────────────────────────────────
-//  IMAGE PICK & UPLOAD  (lines ~110‑130)
-// ──────────────────────────────────────────────────────────────
-Future<void> _pickImage() async {
-  setState(() {
-    _uploading = true;
-    _uploadProgress = 0.0;
-  });
-
-  final picker = ImagePicker();
-  final xFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
-  if (xFile == null) {
-    setState(() => _uploading = false);
-    return;
-  }
-
-  final url = await uploadImage(
-    context: context,
-    file: xFile,
-    handle: 'x-image',
-    multiple: false,
-    setUploadingState: (b) => setState(() => _uploading = b),
-    onProgress: (p) => setState(() => _uploadProgress = p),
-  );
-
-  if (url != null) _imageUrl = url;
-  setState(() => _uploading = false);
-}
-
-  // ──────────────────────────────────────────────────────────────
-  //  BUILD
-  // ──────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final $system = ref.read(systemProvider);
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final bg = dark ? const Color(0xFF202020) : const Color(0xFFF1F3F4);
-    final inputBg = dark ? const Color(0xFF2C2C2C) : Colors.white;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final inputBg = isDark ? const Color(0xFF2A2A2A) : Colors.white;
+    final hintColor = isDark ? Colors.grey[400] : Colors.grey[600];
+    final borderColor = isDark ? Colors.grey[700] : Colors.grey[300];
 
-    return Container(
-      color: bg,
-      padding: EdgeInsets.only(
-        left: 8,
-        right: 8,
-        top: 8,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
-      ),
-      child: Row(
-        children: [
-          // ── Emoji ──
-          IconButton(
-            icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey[600]),
-            onPressed: () {},
-          ),
+    final bool hasText = _textController.text.trim().isNotEmpty;
+    final bool showSendButton = hasText || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty;
 
-          // ── Image preview / attach / progress ──
-          if (_imageUrl.isNotEmpty)
-            Stack(
+    return Column(
+      children: [
+        // Image Preview
+        if (_imageUrl.isNotEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Stack(
               children: [
                 Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  width: 64,
-                  height: 64,
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    image: DecorationImage(
-                      image: NetworkImage("${$system['system_uploads']}/$_imageUrl"),
+                    border: Border.all(color: borderColor, width: 1),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      "${$system['system_uploads']}/$_imageUrl",
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 Positioned(
                   top: -8,
-                  right: 0,
+                  right: -8,
                   child: IconButton(
-                    icon: const Icon(Icons.cancel, color: Colors.red, size: 22),
-                    onPressed: () => setState(() => _imageUrl = ''),
+                    icon: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.close, color: Colors.white, size: 18),
+                    ),
+                    onPressed: _deleteImage,
                   ),
                 ),
               ],
-            )
-          else if (_uploading)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  value: _uploadProgress > 0 ? _uploadProgress : null,
-                  strokeWidth: 2.5,
-                  color: xPrimaryColor,
-                ),
-              ),
-            )
-          else
-            IconButton(
-              icon: SvgPicture.asset(
-                "assets/images/icons/chat/image.svg",
-                width: 24,
-                height: 24,
-                colorFilter: const ColorFilter.mode(xPrimaryColor, BlendMode.srcIn),
-              ),
-              onPressed: _pickImage,
             ),
+          ),
 
-          // ── Text field + mic/send inside ──
-          Expanded(
-            child: Container(
-              constraints: const BoxConstraints(maxHeight: 140),
-              decoration: BoxDecoration(
-                color: inputBg,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
+        // Main Input Row
+        Container(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(
+            top: false,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Attachment Button (Always visible like WhatsApp)
+                if (isTrue($system['chat_photos_enabled']))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8, bottom: 8),
+                    child: IconButton(
+                      onPressed: () async {
+                        setState(() => _uploadingImage = true);
+                        final url = await showImageUploadOptions(
+                          context: context,
+                          setUploadingState: (uploading) => setState(() => _uploadingImage = uploading),
+                        );
+                        if (url != null) setState(() => _imageUrl = url);
+                      },
+                      icon: Icon(Icons.attach_file, color: xPrimaryColor, size: 24),
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+                    ),
+                  ),
+
+                // Emoji/GIF Button
+                Padding(
+                  padding: const EdgeInsets.only(right: 8, bottom: 8),
+                  child: IconButton(
+                    onPressed: () {
+                      // TODO: Implement emoji picker
+                      // For now, toggle between emoji and GIF
+                      setState(() {
+                        _showEmoji = !_showEmoji;
+                      });
+                    },
+                    icon: Icon(
+                      _showEmoji ? Icons.emoji_emotions : Icons.gif,
+                      color: xPrimaryColor,
+                      size: 24,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+                  ),
+                ),
+
+                // Text Input (Expandable like WhatsApp/Telegram)
+                Expanded(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxHeight: 120, // 6 lines maximum
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: inputBg,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: borderColor, width: 1),
+                    ),
                     child: TextField(
                       controller: _textController,
                       focusNode: _focusNode,
-                      minLines: 1,
-                      maxLines: 5,
                       keyboardType: TextInputType.multiline,
                       textInputAction: TextInputAction.newline,
-                      style: TextStyle(fontSize: 16, color: dark ? Colors.white : Colors.black87),
+                      minLines: 1,
+                      maxLines: null, // Allows auto-expansion
                       decoration: InputDecoration(
-                        hintText: tr('Speak your mind...'),
-                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        hintText: tr('Type a message...'),
+                        hintStyle: TextStyle(color: hintColor, fontSize: 16),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
                       ),
-                      onChanged: _onTyping,
+                      style: TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                      onChanged: _handleTyping,
+                      onSubmitted: (_) {
+                        if (showSendButton) _sendMessage();
+                      },
                     ),
                   ),
+                ),
 
-                  // ── Voice / Send button ──
-                  GestureDetector(
-                    onLongPressStart: (_) async {
-                      if (_locked) return;
-                      setState(() => _recording = true);
-                      await VoiceRecorder().startRecording(
-                        context: context,
-                        setRecordingState: (r) => setState(() => _recording = r),
-                      );
-                    },
-                    onLongPressEnd: (_) async {
-                      if (_locked) return;
-                      final url = await VoiceRecorder().stopRecording(
-                        context: context,
-                        setRecordingState: (r) => setState(() => _recording = r),
-                      );
-                      if (url != null) {
-                        _voiceUrl = url;
-                        await _send();
-                      }
-                      setState(() => _recording = false);
-                    },
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: _textController.text.isNotEmpty || _imageUrl.isNotEmpty
-                          ? xPrimaryColor
-                          : Colors.transparent,
-                      child: Icon(
-                        _textController.text.isNotEmpty || _imageUrl.isNotEmpty
-                            ? Icons.send_rounded
-                            : (_recording ? Icons.mic : Icons.mic_none),
-                        color: _textController.text.isNotEmpty || _imageUrl.isNotEmpty
-                            ? Colors.white
-                            : Colors.grey[600],
-                        size: 22,
-                      ),
-                    ),
+                // Send/Voice Button
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, bottom: 8),
+                  child: AnimatedSwitcher(
+                    duration: Duration(milliseconds: 200),
+                    child: showSendButton
+                        ? IconButton(
+                            key: ValueKey('send'),
+                            onPressed: _sendMessage,
+                            icon: Container(
+                              decoration: BoxDecoration(
+                                color: xPrimaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: EdgeInsets.all(8),
+                              child: Icon(Icons.send, color: Colors.white, size: 20),
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+                          )
+                        : isTrue($system['voice_notes_chat_enabled'])
+                            ? Row(
+                                key: ValueKey('voice'),
+                                children: [
+                                  if (_isRecording) ...[
+                                    TimerWidget(),
+                                    SizedBox(width: 8),
+                                  ],
+                                  IconButton(
+                                    onPressed: () async {
+                                      if (!_isRecording) {
+                                        await VoiceRecorder().startRecording(
+                                          context: context,
+                                          setRecordingState: (recording) => setState(() => _isRecording = recording),
+                                        );
+                                      } else {
+                                        final url = await VoiceRecorder().stopRecording(
+                                          context: context,
+                                          setRecordingState: (recording) => setState(() => _isRecording = recording),
+                                        );
+                                        if (url != null) {
+                                          setState(() => _voiceNoteUrl = url);
+                                          await _sendMessage();
+                                        }
+                                      }
+                                    },
+                                    icon: Container(
+                                      decoration: BoxDecoration(
+                                        color: _isRecording ? Colors.red : xPrimaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: EdgeInsets.all(8),
+                                      child: Icon(
+                                        _isRecording ? Icons.stop : Icons.mic,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+                                  ),
+                                ],
+                              )
+                            : SizedBox(width: 40), // Placeholder for consistent spacing
                   ),
-                  const SizedBox(width: 8),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
