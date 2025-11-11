@@ -319,107 +319,170 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 ),
 
         // Expanded input + image preview
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+Expanded(
+  child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      // Inline image preview + caption
+      if (_imageUrl.isNotEmpty)
+        Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: Row(
             children: [
-              // Inline image preview + caption (if any)
-              if (_imageUrl.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          "${$system['system_uploads']}/$_imageUrl",
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                        ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  "${$system['system_uploads']}/$_imageUrl",
+                  width: 72,
+                  height: 72,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: TextEditingController(text: _caption),
+                      onChanged: (v) => _caption = v,
+                      decoration: InputDecoration(
+                        hintText: tr('Add a caption...'),
+                        border: InputBorder.none,
+                        isDense: true,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            TextField(
-                              controller: TextEditingController(text: _caption),
-                              onChanged: (v) => _caption = v,
-                              decoration: InputDecoration(
-                                hintText: tr('Add a caption...'),
-                                border: InputBorder.none,
-                                isDense: true,
-                              ),
-                              maxLines: 3,
-                            ),
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: IconButton(
-                                icon: const Icon(Icons.close, size: 20, color: Colors.red),
-                                onPressed: _deleteImage,
-                              ),
-                            )
-                          ],
-                        ),
+                      maxLines: 3,
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, size: 20, color: Colors.red),
+                        onPressed: _deleteImage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+      // Telegram-style flat input bar (all buttons inside, full width)
+      Container(
+        color: inputBg,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          children: [
+            // Emoji button
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _showEmojiPicker = !_showEmojiPicker;
+                  if (_showEmojiPicker) {
+                    _focusNode.unfocus();
+                  } else {
+                    _focusNode.requestFocus();
+                  }
+                });
+              },
+              icon: Icon(
+                _showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions_outlined,
+                color: xPrimaryColor,
+              ),
+              splashRadius: 20,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+
+            // Attachment button
+            IconButton(
+              onPressed: _pickImage,
+              icon: SvgPicture.asset(
+                "assets/images/icons/chat/attach.svg",
+                width: 22,
+                height: 22,
+                colorFilter: ColorFilter.mode(
+                  isDark ? Colors.white70 : Colors.black54,
+                  BlendMode.srcIn,
+                ),
+              ),
+              splashRadius: 20,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+
+            // Text field
+            Expanded(
+              child: TextField(
+                controller: _textController,
+                focusNode: _focusNode,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                minLines: 1,
+                maxLines: 6,
+                decoration: InputDecoration(
+                  hintText: tr('Speak your mind...'),
+                  hintStyle: TextStyle(color: hintColor, fontSize: 16),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                ),
+                style: TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                contextMenuBuilder: (context, editableTextState) {
+                  final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
+                  return AdaptiveTextSelectionToolbar.buttonItems(
+                    anchors: editableTextState.contextMenuAnchors,
+                    buttonItems: [
+                      ...buttonItems,
+                      ContextMenuButtonItem(
+                        label: tr('Clipboard'),
+                        onPressed: () {
+                          editableTextState.hideToolbar();
+                          _showClipboardPicker();
+                        },
                       ),
                     ],
-                  ),
-                ),
+                  );
+                },
+              ),
+            ),
 
-              // Input background (telegram-style)
-              Container(
-                constraints: const BoxConstraints(maxHeight: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: inputBg,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.transparent),
-                  boxShadow: isDark
-                      ? null
-                      : [
-                          // subtle shadow like Telegram iOS (but keep minimal)
-                          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))
-                        ],
-                ),
-                child: Row(
-                  children: [
-                    // Text field
-                    Expanded(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: 20),
-                        child: TextField(
-                          controller: _textController,
-                          focusNode: _focusNode,
-                          keyboardType: TextInputType.multiline,
-                          textInputAction: TextInputAction.newline,
-                          minLines: 1,
-                          maxLines: 6,
-                          decoration: InputDecoration(
-                            hintText: tr('Speak your mind...'),
-                            hintStyle: TextStyle(color: hintColor, fontSize: 16),
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
-                          style:
-                              TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
-                          // Custom context menu: best-effort 'Clipboard' picker
-                          contextMenuBuilder: (context, editableTextState) {
-  final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
-  return AdaptiveTextSelectionToolbar.buttonItems(
-    anchors: editableTextState.contextMenuAnchors,
-    buttonItems: [
-      ...buttonItems,
-      ContextMenuButtonItem(
-        label: tr('Clipboard'),
-        onPressed: () {
-          editableTextState.hideToolbar();
-          _showClipboardPicker();
-        },
+            // Mic / Send
+            IconButton(
+              icon: Icon(
+                _isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty
+                    ? Icons.send
+                    : (_isRecording ? Icons.stop : Icons.mic),
+                color: xPrimaryColor,
+              ),
+              onPressed: _isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty
+                  ? _sendMessage
+                  : _startOrStopRecording,
+              splashRadius: 20,
+            ),
+          ],
+        ),
       ),
     ],
-  );
-},
+  ),
+),
+
+      // Mic / Send button
+      if (_isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty)
+        IconButton(
+          icon: const Icon(Icons.send, color: xPrimaryColor),
+          onPressed: _sendMessage,
+          splashRadius: 20,
+        )
+      else
+        IconButton(
+          icon: Icon(_isRecording ? Icons.stop : Icons.mic, color: xPrimaryColor),
+          onPressed: _startOrStopRecording,
+          splashRadius: 20,
+        ),
+    ],
+  ),
+),
                         ),
                       ),
                     ),
