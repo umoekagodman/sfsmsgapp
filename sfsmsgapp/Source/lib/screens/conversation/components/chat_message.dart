@@ -210,22 +210,11 @@ class ChatMessage extends ConsumerWidget {
             ),
 
           Row(
-            mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // avatar (left)
-              if (!isCurrentUser)
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: ProfileAvatar(
-                    imageUrl: message['user_picture'],
-                    radius: avatarRadius,
-                  ),
-                ),
-
-              Flexible(child: bubbleChild()),
-            ],
-          ),
+  mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+  children: [
+    Flexible(child: bubbleChild()),
+  ],
+),
         ],
       ),
     );
