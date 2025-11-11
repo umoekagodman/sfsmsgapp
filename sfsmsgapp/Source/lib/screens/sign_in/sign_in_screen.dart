@@ -205,7 +205,7 @@ class _Body extends ConsumerWidget {
                     child: Text(
                       tr("Sign Up!"),
                       style: TextStyle(
-                        color: buttonBg, // matches splash button color
+                        // color: buttonBg, matches splash button color
                         fontWeight: FontWeight.bold,
                       ),
                     ),
