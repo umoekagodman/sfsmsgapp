@@ -173,15 +173,17 @@ class ChatMessage extends ConsumerWidget {
 
             // timestamp row: new line, right aligned
             Container(
-              margin: const EdgeInsets.only(top: 6),
-              child: Text(
-                timeString,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isDark ? Colors.white60 : Colors.grey[600],
-                ),
-              ),
-            ),
+  margin: const EdgeInsets.only(top: 6),
+  child: Text(
+    timeString,
+    style: TextStyle(
+      fontSize: 11,
+      color: isCurrentUser
+          ? Colors.white.withOpacity(0.8)
+          : (isDark ? Colors.white70 : Colors.black54),
+    ),
+  ),
+),
           ],
         ),
       );
