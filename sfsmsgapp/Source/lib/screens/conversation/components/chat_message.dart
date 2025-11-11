@@ -82,10 +82,11 @@ class ChatMessage extends ConsumerWidget {
     Widget bubbleChild() {
       return Container(
         constraints: BoxConstraints(
-          maxWidth: bubbleMaxWidth,
           minWidth: bubbleMinWidth,
+          maxWidth: bubbleMaxWidth,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        width: null, // let width adapt dynamically
         decoration: bubbleDecoration(isCurrentUser),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
