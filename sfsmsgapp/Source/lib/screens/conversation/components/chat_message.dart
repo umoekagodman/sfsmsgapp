@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voice_message_package/voice_message_package.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:flutter_html/flutter_html.dart'; 
+import 'package:flutter_html/flutter_html.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/intl.dart';
 
@@ -35,50 +35,60 @@ class ChatMessage extends ConsumerWidget {
     final double avatarDiameter = avatarRadius * 2;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final bubbleMaxWidth = screenWidth * 0.78; // ~Telegram feel
-    final bubbleMinWidth = 50.0;
 
-    // convert time to local and format HH:mm
+    // Telegram’s real feel: 75% of width, slightly narrower for single words
+    final bubbleMaxWidth = screenWidth * 0.75;
+    const bubbleMinWidth = 48.0;
+
+    // Convert time to local HH:mm
     DateTime sentTime = convertedTime(message['time']);
-    final timeString = DateFormat.Hm().format(sentTime); // 24-hour HH:mm
+    final timeString = DateFormat.Hm().format(sentTime);
 
-    // Content widget (text/html)
+    // Determine message type
+    final hasText =
+        message['message'] != null && message['message'].toString().trim().isNotEmpty;
+    final hasImage =
+        message['image'] != null && message['image'].toString().isNotEmpty;
+    final hasVoice =
+        message['voice_note'] != null && message['voice_note'].toString().isNotEmpty;
+
+    // Text content
     Widget contentWidget = const SizedBox.shrink();
-    final hasText = (message['message'] != null && message['message'].toString().trim().isNotEmpty);
-    final hasImage = (message['image'] != null && message['image'].toString().isNotEmpty);
-    final hasVoice = (message['voice_note'] != null && message['voice_note'].toString().isNotEmpty);
-
     if (hasText) {
-      contentWidget = Html(
-        data: message['message'],
-        style: {
-          "body": Style(
-            margin: Margins.zero,
-            padding: HtmlPaddings.zero,
-            fontSize: FontSize(16),
-            color: isCurrentUser ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-            lineHeight: const LineHeight(1.4),
-          ),
-        },
+      contentWidget = Flexible(
+        child: Html(
+          data: message['message'],
+          style: {
+            "body": Style(
+              margin: Margins.zero,
+              padding: HtmlPaddings.zero,
+              fontSize: FontSize(16),
+              color: isCurrentUser
+                  ? Colors.white
+                  : (isDark ? Colors.white70 : Colors.black87),
+              lineHeight: const LineHeight(1.35),
+            ),
+          },
+        ),
       );
     }
 
-    // Bubble decoration
+    // Bubble decoration (rounded tail)
     BoxDecoration bubbleDecoration(bool me) {
       return BoxDecoration(
         color: me
             ? xPrimaryColor
             : (isDark ? const Color(0xFF2A2B2C) : const Color(0xFFF2F3F5)),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(18),
-          topRight: Radius.circular(18),
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
           bottomLeft: Radius.circular(me ? 18 : 4),
           bottomRight: Radius.circular(me ? 4 : 18),
         ),
       );
     }
 
-    // Build bubble child which contains content + timestamp row (timestamp right aligned in new line)
+    // Bubble layout
     Widget bubbleChild() {
       return Container(
         constraints: BoxConstraints(
@@ -86,18 +96,22 @@ class ChatMessage extends ConsumerWidget {
           maxWidth: bubbleMaxWidth,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        width: null, // let width adapt dynamically
         decoration: bubbleDecoration(isCurrentUser),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment:
+              hasImage || hasVoice ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // If it's a reply/quoted message, show small header line with quoted sender
+            // Quoted message header
             if (message['reply_to'] != null && message['reply_to'].isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: isCurrentUser ? xPrimaryColor.withOpacity(0.12) : Colors.grey.shade200,
+                  color: isCurrentUser
+                      ? xPrimaryColor.withOpacity(0.12)
+                      : Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -105,15 +119,15 @@ class ChatMessage extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isCurrentUser ? Colors.white70 : Colors.black87,
+                    color:
+                        isCurrentUser ? Colors.white70 : Colors.black87,
                   ),
                 ),
               ),
 
-            // text html
             if (hasText) contentWidget,
 
-            // image
+            // Image message
             if (hasImage)
               Container(
                 margin: EdgeInsets.only(top: hasText ? 6 : 0),
@@ -125,21 +139,24 @@ class ChatMessage extends ConsumerWidget {
                       "${$system['system_uploads']}/${message['image']}",
                       fit: BoxFit.cover,
                       width: bubbleMaxWidth * 0.65,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.error, size: 24),
                     ),
                   ),
                 ),
               ),
 
-            // voice
+            // Voice message
             if (hasVoice)
               Container(
                 margin: EdgeInsets.only(top: hasText || hasImage ? 6 : 0),
                 child: VoiceMessageView(
                   controller: VoiceController(
-                    audioSrc: "${$system['system_uploads']}/${message['voice_note']}",
+                    audioSrc:
+                        "${$system['system_uploads']}/${message['voice_note']}",
                     maxDuration: Duration(
-                        seconds: int.parse($system['voice_notes_durtaion'] ?? '60')),
+                        seconds:
+                            int.parse($system['voice_notes_durtaion'] ?? '60')),
                     isFile: false,
                     onComplete: () {},
                     onPause: () {},
@@ -149,56 +166,71 @@ class ChatMessage extends ConsumerWidget {
                   cornerRadius: 12,
                   backgroundColor: isCurrentUser
                       ? xPrimaryColor
-                      : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
-                  activeSliderColor:
-                      isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
+                      : (isDark
+                          ? const Color(0xFF3A3B3B)
+                          : Colors.grey.shade200),
+                  activeSliderColor: isCurrentUser
+                      ? Colors.white
+                      : (isDark ? Colors.white : Colors.black),
                   circlesColor: isCurrentUser
                       ? xPrimaryColor
-                      : (isDark ? const Color(0xFF3a3b3b) : Colors.grey.shade200),
+                      : (isDark
+                          ? const Color(0xFF3A3B3B)
+                          : Colors.grey.shade200),
                   playIcon: Icon(Icons.play_arrow_rounded,
-                      color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black)),
+                      color: isCurrentUser
+                          ? Colors.white
+                          : (isDark ? Colors.white : Colors.black)),
                   pauseIcon: Icon(Icons.pause_rounded,
-                      color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black)),
+                      color: isCurrentUser
+                          ? Colors.white
+                          : (isDark ? Colors.white : Colors.black)),
                   size: 40,
                   counterTextStyle: TextStyle(
-                    color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
+                    color: isCurrentUser
+                        ? Colors.white
+                        : (isDark ? Colors.white : Colors.black),
                     fontSize: 10,
                   ),
                   circlesTextStyle: TextStyle(
-                    color: isCurrentUser ? Colors.white : (isDark ? Colors.white : Colors.black),
+                    color: isCurrentUser
+                        ? Colors.white
+                        : (isDark ? Colors.white : Colors.black),
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
 
-            // timestamp row: new line, right aligned
+            // Timestamp
             Container(
-  margin: const EdgeInsets.only(top: 6),
-  child: Text(
-    timeString,
-    style: TextStyle(
-      fontSize: 11,
-      color: isCurrentUser
-          ? Colors.white.withOpacity(0.8)
-          : (isDark ? Colors.white70 : Colors.black54),
-    ),
-  ),
-),
+              margin: const EdgeInsets.only(top: 6),
+              alignment: Alignment.bottomRight,
+              child: Text(
+                timeString,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isCurrentUser
+                      ? Colors.white.withOpacity(0.8)
+                      : (isDark ? Colors.white70 : Colors.black54),
+                ),
+              ),
+            ),
           ],
         ),
       );
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
       child: Column(
-        crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          // show sender name for group chats above bubble (Telegram-like)
           if (!isCurrentUser && isMultipleRecipients)
             Padding(
-              padding: EdgeInsets.only(bottom: 6, left: avatarDiameter + 8),
+              padding:
+                  EdgeInsets.only(bottom: 6, left: avatarDiameter + 8),
               child: Text(
                 message['user_fullname'],
                 style: TextStyle(
@@ -208,19 +240,21 @@ class ChatMessage extends ConsumerWidget {
                 ),
               ),
             ),
-
           Row(
-  mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-  children: [
-    Flexible(child: bubbleChild()),
-  ],
-),
+            mainAxisAlignment: isCurrentUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+            children: [
+              Flexible(child: bubbleChild()),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  void _showImageFullScreen(BuildContext context, Map<String, dynamic> system, Map<String, dynamic> msg) {
+  void _showImageFullScreen(
+      BuildContext context, Map<String, dynamic> system, Map<String, dynamic> msg) {
     showDialog(
       context: context,
       builder: (_) => Dialog(
@@ -234,8 +268,10 @@ class ChatMessage extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: PhotoView(
-                imageProvider: NetworkImage("${system['system_uploads']}/${msg['image']}"),
-                backgroundDecoration: const BoxDecoration(color: Colors.transparent),
+                imageProvider:
+                    NetworkImage("${system['system_uploads']}/${msg['image']}"),
+                backgroundDecoration:
+                    const BoxDecoration(color: Colors.transparent),
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered * 2,
               ),
@@ -244,9 +280,11 @@ class ChatMessage extends ConsumerWidget {
               top: 10,
               right: 10,
               child: IconButton(
-                icon: const Icon(Icons.download, color: Colors.white),
+                icon:
+                    const Icon(Icons.download, color: Colors.white, size: 22),
                 onPressed: () async {
-                  final saved = await saveImageToGallery("${system['system_uploads']}/${msg['image']}");
+                  final saved = await saveImageToGallery(
+                      "${system['system_uploads']}/${msg['image']}");
                   if (saved) showSavedOverlay(context);
                   Navigator.of(context).pop();
                 },
@@ -256,7 +294,8 @@ class ChatMessage extends ConsumerWidget {
               top: 10,
               left: 10,
               child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
+                icon:
+                    const Icon(Icons.close, color: Colors.white, size: 22),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
