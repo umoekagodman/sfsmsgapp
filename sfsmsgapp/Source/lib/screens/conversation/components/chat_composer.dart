@@ -461,32 +461,6 @@ Expanded(
             ],
           ),
         ),
-
-        // Right: mic or send depending on typing or other attachments
-        if (_isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: CircleAvatar(
-              radius: 22,
-              backgroundColor: xPrimaryColor,
-              child: IconButton(
-                icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                onPressed: _sendMessage,
-              ),
-            ),
-          )
-        else
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: CircleAvatar(
-              radius: 22,
-              backgroundColor: _isRecording ? Colors.red : xPrimaryColor,
-              child: IconButton(
-                icon: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white),
-                onPressed: _startOrStopRecording,
-              ),
-            ),
-          ),
       ],
     );
 
