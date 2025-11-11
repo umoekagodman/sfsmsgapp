@@ -303,14 +303,20 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
         // Attach button (paperclip)
         IconButton(
-          onPressed: _pickImage,
-          icon: SvgPicture.asset(
-            "assets/images/icons/chat/attach.svg",
-            width: 22,
-            height: 22,
-            colorFilter: const ColorFilter.mode(xPrimaryColor, BlendMode.srcIn),
-          ),
-        ),
+  onPressed: _pickImage,
+  icon: SvgPicture.asset(
+    "assets/images/icons/chat/attach.svg",
+    width: 22,
+    height: 22,
+    colorFilter: ColorFilter.mode(
+      isDark ? Colors.white70 : Colors.black54,
+      BlendMode.srcIn,
+    ),
+  ),
+  padding: EdgeInsets.zero,
+  constraints: const BoxConstraints(),
+  splashRadius: 20,
+),
 
         // Expanded input + image preview
         Expanded(
