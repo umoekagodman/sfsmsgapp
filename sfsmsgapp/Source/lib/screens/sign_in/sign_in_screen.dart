@@ -54,24 +54,10 @@ class _Body extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
-            const SizedBox(height: 40),
-            Text(
-              tr("Sign In to your Account"),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              tr("Welcome back! please enter your details"),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 60),
+            // Removed the "Sign In to your Account" and "Welcome back!" text block.
+            // Kept a small spacer to preserve layout.
+            const SizedBox(height: 20),
+
             SignInForm(),
             (socialLoginEnabled && isTrue($system['social_login_enabled']))
                 ? Column(
