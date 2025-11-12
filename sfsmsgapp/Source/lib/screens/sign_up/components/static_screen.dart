@@ -6,7 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 
 class StaticScreen extends StatelessWidget {
   final String title;
-  final Future<String> content;
+  final String content;
 
   const StaticScreen({
     super.key,
