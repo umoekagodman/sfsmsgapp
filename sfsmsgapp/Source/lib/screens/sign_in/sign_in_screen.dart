@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-
-// Import Third Party Packages
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Import App Files
 import '../../common/config.dart';
 import '../../routes/router.gr.dart';
 import '../../states/system_state.dart';
@@ -28,192 +25,194 @@ class SignInScreen extends StatelessWidget {
         ? "assets/images/welcome_logo_light.png"
         : "assets/images/welcome_logo.png";
 
+    // Match splash screen button style
     final buttonBg = isDark ? const Color(0xFFD1D1D1) : const Color(0xFF242527);
     final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFD1D1D1);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 16, left: 8),
-          child: Image.asset(
-            logoPath,
-            width: 73,
-            height: 42,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => const LanguageSelectionDialog(),
-              );
-            },
-            icon: const Icon(Icons.translate),
-          ),
-        ],
-      ),
-      body: _Body(
-        buttonBg: buttonBg,
-        buttonText: buttonText,
-      ),
-    );
-  }
-}
+      body: Stack(
+        children: [
+          // Scrollable form content
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 100),
 
-class _Body extends ConsumerWidget {
-  final Color buttonBg;
-  final Color buttonText;
+                  // Title
+                  Text(
+                    tr("Sign In"),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
 
-  const _Body({
-    required this.buttonBg,
-    required this.buttonText,
-  });
+                  const SizedBox(height: 50),
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final $system = ref.watch(systemProvider);
+                  // Sign-in form fields
+                  const SignInForm(),
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            // Title text updated: only "Sign In"
-            Text(
-              tr("Sign In"),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 60),
+                  const SizedBox(height: 30),
 
-            // Sign in form
-            const SignInForm(),
-
-            // Social login section
-            (socialLoginEnabled && isTrue($system['social_login_enabled']))
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      DividerText(tr("Or")),
-                      Column(
+                  // Sign-in button (styled like splash)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Trigger sign-in from form (handled inside SignInForm)
+                        FocusScope.of(context).unfocus();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonBg,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Facebook login
-                          if (isTrue($system['facebook_login_enabled']))
-                            Column(
-                              children: [
-                                SocialLoginButton(
-                                  text: tr('Sign in with Facebook'),
-                                  image:
-                                      'assets/images/icons/social/facebook.svg',
-                                  onTap: () {},
-                                ),
-                                const SizedBox(height: 15),
-                              ],
+                          Text(
+                            tr("Sign In"),
+                            style: TextStyle(
+                              color: buttonText,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
                             ),
-                          // Google login
-                          if (isTrue($system['google_login_enabled']))
-                            Column(
-                              children: [
-                                SocialLoginButton(
-                                  text: tr('Sign in with Google'),
-                                  image:
-                                      'assets/images/icons/social/google.svg',
-                                  onTap: () {},
-                                ),
-                                const SizedBox(height: 15),
-                              ],
-                            ),
-                          // Twitter login
-                          if (isTrue($system['twitter_login_enabled']))
-                            Column(
-                              children: [
-                                SocialLoginButton(
-                                  text: tr('Sign in with X'),
-                                  image:
-                                      'assets/images/icons/social/twitter.svg',
-                                  onTap: () {},
-                                ),
-                                const SizedBox(height: 15),
-                              ],
-                            ),
-                          // LinkedIn login
-                          if (isTrue($system['linkedin_login_enabled']))
-                            Column(
-                              children: [
-                                SocialLoginButton(
-                                  text: tr('Sign in with LinkedIn'),
-                                  image:
-                                      'assets/images/icons/social/linkedin.svg',
-                                  onTap: () {},
-                                ),
-                                const SizedBox(height: 15),
-                              ],
-                            ),
-                          // VK login
-                          if (isTrue($system['vk_login_enabled']))
-                            Column(
-                              children: [
-                                SocialLoginButton(
-                                  text: tr('Sign in with VK'),
-                                  image:
-                                      'assets/images/icons/social/vk.svg',
-                                  onTap: () {},
-                                ),
-                                const SizedBox(height: 15),
-                              ],
-                            ),
-                          // WordPress login
-                          if (isTrue($system['wordpress_login_enabled']))
-                            Column(
-                              children: [
-                                SocialLoginButton(
-                                  text: tr('Sign in with WordPress'),
-                                  image:
-                                      'assets/images/icons/social/wordpress.svg',
-                                  onTap: () {},
-                                ),
-                                const SizedBox(height: 15),
-                              ],
-                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: buttonText,
+                            size: 22,
+                          ),
                         ],
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-
-            const SizedBox(height: 20),
-
-            // Sign up prompt
-            if (isTrue($system['registration_enabled']))
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(tr("Don't have an account?")),
-                  TextButton(
-                    onPressed: () {
-                      context.router.push(const SignUpRoute());
-                    },
-                    child: Text(
-                      tr("Sign Up!"),
-                      style: TextStyle(
-                        // color: buttonBg, matches splash button color
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 40),
+
+                  // Social login
+                  Consumer(builder: (context, ref, _) {
+                    final $system = ref.watch(systemProvider);
+                    if (!(socialLoginEnabled && isTrue($system['social_login_enabled']))) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return Column(
+                      children: [
+                        DividerText(tr("Or")),
+                        const SizedBox(height: 16),
+                        if (isTrue($system['facebook_login_enabled']))
+                          Column(
+                            children: [
+                              SocialLoginButton(
+                                text: tr('Sign in with Facebook'),
+                                image: 'assets/images/icons/social/facebook.svg',
+                                onTap: () {},
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          ),
+                        if (isTrue($system['google_login_enabled']))
+                          Column(
+                            children: [
+                              SocialLoginButton(
+                                text: tr('Sign in with Google'),
+                                image: 'assets/images/icons/social/google.svg',
+                                onTap: () {},
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          ),
+                        if (isTrue($system['twitter_login_enabled']))
+                          Column(
+                            children: [
+                              SocialLoginButton(
+                                text: tr('Sign in with X'),
+                                image: 'assets/images/icons/social/twitter.svg',
+                                onTap: () {},
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          ),
+                        if (isTrue($system['linkedin_login_enabled']))
+                          Column(
+                            children: [
+                              SocialLoginButton(
+                                text: tr('Sign in with LinkedIn'),
+                                image: 'assets/images/icons/social/linkedin.svg',
+                                onTap: () {},
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          ),
+                      ],
+                    );
+                  }),
+
+                  const SizedBox(height: 25),
+
+                  // Sign-up prompt
+                  Consumer(builder: (context, ref, _) {
+                    final $system = ref.watch(systemProvider);
+                    if (!isTrue($system['registration_enabled'])) return const SizedBox.shrink();
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(tr("Don't have an account?")),
+                        TextButton(
+                          onPressed: () => context.router.push(const SignUpRoute()),
+                          child: Text(
+                            tr("Sign Up!"),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+
+                  const SizedBox(height: 30),
                 ],
               ),
-          ],
-        ),
+            ),
+          ),
+
+          // Floating logo (high z-index)
+          Positioned(
+            top: 30,
+            left: 20,
+            child: Material(
+              elevation: 8,
+              color: Colors.transparent,
+              child: Image.asset(
+                logoPath,
+                width: 80,
+                height: 45,
+              ),
+            ),
+          ),
+
+          // Language button (top right)
+          Positioned(
+            top: 30,
+            right: 10,
+            child: IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const LanguageSelectionDialog(),
+                );
+              },
+              icon: const Icon(Icons.translate, size: 26),
+            ),
+          ),
+        ],
       ),
     );
   }
