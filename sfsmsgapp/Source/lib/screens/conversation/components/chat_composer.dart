@@ -4,17 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:intl/intl.dart';
-
 import '../../../common/themes.dart';
 import '../../../states/system_state.dart';
 import '../../../utilities/functions.dart';
 import '../../../utilities/image_uploader.dart';
 import '../../../utilities/voice_recorder.dart';
 import '../../../widgets/snackbars.dart';
-import '../../../widgets/timer.dart';
 
 class ChatComposer extends ConsumerStatefulWidget {
   final String? conversationId;
@@ -66,7 +62,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
         _updateTypingStatus(_isTyping);
       });
     }
-    setState(() {}); // rebuild to toggle send/mic
+    setState(() {}); // rebuild send/mic toggle
   }
 
   Future<void> _updateTypingStatus(bool typing) async {
@@ -191,7 +187,7 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(tr('Clipboard'), style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(tr('Clipboard'), style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 SingleChildScrollView(child: Text(text)),
                 const SizedBox(height: 16),
@@ -228,14 +224,15 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
 
   Widget _emojiPicker() {
     const emojis = [
-      '😀','😂','😍','🤔','👍','👎','🙏','🔥','🎉','🙌','😢','😁',
-      '😎','😉','🤷','😅','🤩','😇','🤝','👏'
+      '😀', '😂', '😍', '🤔', '👍', '👎', '🙏', '🔥',
+      '🎉', '🙌', '😢', '😁', '😎', '😉', '🤷', '😅',
+      '🤩', '😇', '🤝', '👏'
     ];
     return Container(
       height: 250,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        border: Border(top: BorderSide(color: Colors.grey.shade300, width: 0.5)),
       ),
       child: GridView.count(
         crossAxisCount: 8,
@@ -273,172 +270,144 @@ class _ChatComposerState extends ConsumerState<ChatComposer> {
   Widget build(BuildContext context) {
     final $system = ref.read(systemProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final inputBg = isDark ? const Color(0xFF222222) : Colors.white;
-    final hintColor = isDark ? Colors.grey[400] : Colors.grey[600];
+    final inputBg = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final hintColor = isDark ? Colors.white54 : Colors.grey[600];
 
     return Container(
-      padding: const EdgeInsets.all(8),
-      color: Theme.of(context).scaffoldBackgroundColor,
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!, width: 0.5)),
+        color: inputBg,
+      ),
       child: SafeArea(
+        top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Chat composer
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Inline image preview + caption
-                      if (_imageUrl.isNotEmpty)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  "${$system['system_uploads']}/$_imageUrl",
-                                  width: 72,
-                                  height: 72,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    TextField(
-                                      controller: TextEditingController(text: _caption),
-                                      onChanged: (v) => _caption = v,
-                                      decoration: InputDecoration(
-                                        hintText: tr('Add a caption...'),
-                                        border: InputBorder.none,
-                                        isDense: true,
-                                      ),
-                                      maxLines: 3,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.close, size: 20, color: Colors.red),
-                                        onPressed: _deleteImage,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+            // Image with caption preview
+            if (_imageUrl.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        "${$system['system_uploads']}/$_imageUrl",
+                        width: 72,
+                        height: 72,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: _caption),
+                        onChanged: (v) => _caption = v,
+                        decoration: InputDecoration(
+                          hintText: tr('Add a caption...'),
+                          border: InputBorder.none,
+                          isDense: true,
                         ),
-                      // Flat input bar
-                      Container(
-                        color: inputBg,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        child: Row(
-                          children: [
-                            // Emoji button
-                            IconButton(
+                        maxLines: 3,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _deleteImage,
+                      icon: const Icon(Icons.close, color: Colors.red),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Telegram-style flat input bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _showEmojiPicker = !_showEmojiPicker;
+                        if (_showEmojiPicker) {
+                          _focusNode.unfocus();
+                        } else {
+                          _focusNode.requestFocus();
+                        }
+                      });
+                    },
+                    icon: Icon(
+                      _showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions_outlined,
+                      color: xPrimaryColor,
+                    ),
+                    splashRadius: 22,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _textController,
+                      focusNode: _focusNode,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      minLines: 1,
+                      maxLines: 6,
+                      decoration: InputDecoration(
+                        hintText: tr('Message'),
+                        hintStyle: TextStyle(color: hintColor, fontSize: 16),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      ),
+                      style: TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                      contextMenuBuilder: (context, editableTextState) {
+                        final buttonItems = editableTextState.contextMenuButtonItems;
+                        return AdaptiveTextSelectionToolbar.buttonItems(
+                          anchors: editableTextState.contextMenuAnchors,
+                          buttonItems: [
+                            ...buttonItems,
+                            ContextMenuButtonItem(
+                              label: tr('Clipboard'),
                               onPressed: () {
-                                setState(() {
-                                  _showEmojiPicker = !_showEmojiPicker;
-                                  if (_showEmojiPicker) {
-                                    _focusNode.unfocus();
-                                  } else {
-                                    _focusNode.requestFocus();
-                                  }
-                                });
+                                editableTextState.hideToolbar();
+                                _showClipboardPicker();
                               },
-                              icon: Icon(
-                                _showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions_outlined,
-                                color: xPrimaryColor,
-                              ),
-                              splashRadius: 20,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            // Attachment button
-                            IconButton(
-                              onPressed: _pickImage,
-                              icon: SvgPicture.asset(
-                                "assets/images/icons/chat/attach.svg",
-                                width: 22,
-                                height: 22,
-                                colorFilter: ColorFilter.mode(
-                                  isDark ? Colors.white70 : Colors.black54,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                              splashRadius: 20,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            // Text field
-                            Expanded(
-                              child: TextField(
-                                controller: _textController,
-                                focusNode: _focusNode,
-                                keyboardType: TextInputType.multiline,
-                                textInputAction: TextInputAction.newline,
-                                minLines: 1,
-                                maxLines: 6,
-                                decoration: InputDecoration(
-                                  hintText: tr('Speak your mind...'),
-                                  hintStyle: TextStyle(color: hintColor, fontSize: 16),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding:
-                                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                ),
-                                style: TextStyle(
-                                    fontSize: 16, color: isDark ? Colors.white : Colors.black87),
-                                contextMenuBuilder: (context, editableTextState) {
-                                  final List<ContextMenuButtonItem> buttonItems =
-                                      editableTextState.contextMenuButtonItems;
-                                  return AdaptiveTextSelectionToolbar.buttonItems(
-                                    anchors: editableTextState.contextMenuAnchors,
-                                    buttonItems: [
-                                      ...buttonItems,
-                                      ContextMenuButtonItem(
-                                        label: tr('Clipboard'),
-                                        onPressed: () {
-                                          editableTextState.hideToolbar();
-                                          _showClipboardPicker();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                            // Mic / Send
-                            IconButton(
-                              icon: Icon(
-                                _isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty
-                                    ? Icons.send
-                                    : (_isRecording ? Icons.stop : Icons.mic),
-                                color: xPrimaryColor,
-                              ),
-                              onPressed: _isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty
-                                  ? _sendMessage
-                                  : _startOrStopRecording,
-                              splashRadius: 20,
                             ),
                           ],
-                        ),
-                      ),
-                    ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                  IconButton(
+                    onPressed: _pickImage,
+                    icon: SvgPicture.asset(
+                      "assets/images/icons/chat/attach.svg",
+                      width: 22,
+                      height: 22,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? Colors.white70 : Colors.black54,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    splashRadius: 22,
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty
+                          ? Icons.send
+                          : (_isRecording ? Icons.stop : Icons.mic),
+                      color: xPrimaryColor,
+                    ),
+                    onPressed: _isTyping || _imageUrl.isNotEmpty || _voiceNoteUrl.isNotEmpty
+                        ? _sendMessage
+                        : _startOrStopRecording,
+                    splashRadius: 22,
+                  ),
+                ],
+              ),
             ),
-            // Emoji picker
+
+            // Emoji picker area
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
+              duration: const Duration(milliseconds: 200),
               child: _showEmojiPicker ? _emojiPicker() : const SizedBox.shrink(),
             ),
           ],
