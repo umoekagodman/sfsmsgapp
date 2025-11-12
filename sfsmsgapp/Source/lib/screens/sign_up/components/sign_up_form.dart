@@ -1,6 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart'; 
+import 'package:flutter/gestures.dart';
 
 // Import Third Party Packages
 import 'package:easy_localization/easy_localization.dart';
