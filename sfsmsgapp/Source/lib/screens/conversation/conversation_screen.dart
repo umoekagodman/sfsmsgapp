@@ -383,7 +383,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               if (isRecipientsTyping)
                 Row(
                   children: [
-                    TypingIndicatorBubble(),
+                    TypingIndicatorBubble(isCurrentUser: false),
                     Text(isRecipientsTypingName,
                         style: TextStyle(
                           fontSize: 12,
