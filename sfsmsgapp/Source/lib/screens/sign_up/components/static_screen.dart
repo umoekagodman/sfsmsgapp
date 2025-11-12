@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
-// Import Third Party Packages
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class StaticScreen extends StatelessWidget {
   final String title;
@@ -20,6 +18,7 @@ class StaticScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(25),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
@@ -29,19 +28,15 @@ class StaticScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 25),
-            FutureBuilder<String>(
-              future: content,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Html(data: snapshot.data);
-                } else if (snapshot.hasError) {
-                  return Text(tr("Something went wrong!"));
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
-            ),
+            // Directly show the HTML since content is already loaded
+            (content.isNotEmpty)
+                ? Html(data: content)
+                : Center(
+                    child: Text(
+                      tr("No content available."),
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ),
           ],
         ),
       ),
