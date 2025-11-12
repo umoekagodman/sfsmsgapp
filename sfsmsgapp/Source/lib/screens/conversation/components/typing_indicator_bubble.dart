@@ -1,5 +1,5 @@
 // typing_indicator_bubble.dart
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 
 class TypingIndicatorBubble extends StatelessWidget {
   final bool isCurrentUser;
