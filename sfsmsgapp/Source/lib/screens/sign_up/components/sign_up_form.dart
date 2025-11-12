@@ -517,22 +517,24 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                           fontWeight: FontWeight.bold,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            showModalBottomSheet(
-                              context: context,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(15),
-                                ),
-                              ),
-                              builder: (context) {
-                                return StaticScreen(
-                                  title: tr("Terms and Conditions"),
-                                  content: termsContnet,
-                                );
-                              },
-                            );
-                          },
+                          ..onTap = () async {
+  final termsText = await termsContnet;
+
+  if (!context.mounted) return; // safety check
+
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+    ),
+    builder: (context) {
+      return StaticScreen(
+        title: tr("Terms and Conditions"),
+        content: termsText,
+      );
+    },
+  );
+},
                       ),
                       const TextSpan(text: " "),
                       TextSpan(text: tr("and")),
@@ -544,22 +546,24 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                           fontWeight: FontWeight.bold,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            showModalBottomSheet(
-                              context: context,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(15),
-                                ),
-                              ),
-                              builder: (context) {
-                                return StaticScreen(
-                                  title: tr("Privacy Policy"),
-                                  content: privacyConetnt,
-                                );
-                              },
-                            );
-                          },
+                          ..onTap = () async {
+  final privacyText = await privacyConetnt;
+
+  if (!context.mounted) return;
+
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+    ),
+    builder: (context) {
+      return StaticScreen(
+        title: tr("Privacy Policy"),
+        content: privacyText,
+      );
+    },
+  );
+},
                       ),
                     ],
                   ),
