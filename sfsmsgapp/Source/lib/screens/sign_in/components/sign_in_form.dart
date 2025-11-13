@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
 // Import Third Party Packages
-import 'package:auto_route/auto_route.dart'; 
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,7 +13,14 @@ import '../../../utilities/functions.dart';
 import '../../../widgets/snackbars.dart';
 
 class SignInForm extends ConsumerStatefulWidget {
-  const SignInForm({super.key});
+  final Color buttonBg;
+  final Color buttonText;
+
+  const SignInForm({
+    super.key,
+    required this.buttonBg,
+    required this.buttonText,
+  });
 
   @override
   ConsumerState<SignInForm> createState() => _SignInFormState();
@@ -89,7 +96,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
       setState(() {
         isSubmitLoading = false;
       });
-      
+
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(
@@ -153,7 +160,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             },
           ),
           const SizedBox(height: 10),
-          // Forget Password
+          // Forget Password – keep default blue link style
           TextButton(
             onPressed: () {
               context.router.push(const ForgetPasswordRoute());
@@ -161,19 +168,31 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             child: Text(tr("Forgotten password?")),
           ),
           const SizedBox(height: 10),
-          // Submit
+          // Submit – uses splash-screen colors, no arrow
           ElevatedButton(
             onPressed: _handleSignIn,
             style: ElevatedButton.styleFrom(
+              backgroundColor: widget.buttonBg,
+              foregroundColor: widget.buttonText,
               minimumSize: const Size.fromHeight(50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 0,
             ),
-            child: (isSubmitLoading)
+            child: isSubmitLoading
                 ? const SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(color: Colors.white),
                   )
-                : Text(tr("Sign In")),
+                : Text(
+                    tr("Sign In"),
+                    style: TextStyle(
+                      color: widget.buttonText,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ],
       ),
