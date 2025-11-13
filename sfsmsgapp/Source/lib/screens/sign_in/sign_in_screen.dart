@@ -37,7 +37,7 @@ class SignInScreen extends StatelessWidget {
         elevation: 0,
         titleSpacing: 0,
         title: Padding(
-          padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
+          padding: const EdgeInsets.only(top: 16, left: 8, right: 8, bottom: 4),
           child: Image.asset(
             logoPath,
             width: 73,
