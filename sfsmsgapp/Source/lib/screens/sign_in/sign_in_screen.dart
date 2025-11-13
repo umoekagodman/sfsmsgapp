@@ -28,6 +28,7 @@ class SignInScreen extends StatelessWidget {
         ? "assets/images/welcome_logo_light.png"
         : "assets/images/welcome_logo.png";
 
+    // Same colors as the splash screen button
     final buttonBg = isDark ? const Color(0xFFD1D1D1) : const Color(0xFF242527);
     final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFD1D1D1);
 
@@ -94,8 +95,8 @@ class _Body extends ConsumerWidget {
             ),
             const SizedBox(height: 60),
 
-            // Sign in form
-            const SignInForm(),
+            // Sign in form – now receives the theme colors
+            SignInForm(buttonBg: buttonBg, buttonText: buttonText),
 
             // Social login section
             (socialLoginEnabled && isTrue($system['social_login_enabled']))
@@ -192,7 +193,7 @@ class _Body extends ConsumerWidget {
 
             const SizedBox(height: 20),
 
-            // Sign up prompt
+            // Sign up prompt – keep the link blue (default TextButton color)
             if (isTrue($system['registration_enabled']))
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -204,8 +205,7 @@ class _Body extends ConsumerWidget {
                     },
                     child: Text(
                       tr("Sign Up!"),
-                      style: TextStyle(
-                        // color: buttonBg, matches splash button color
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
