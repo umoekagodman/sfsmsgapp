@@ -35,9 +35,9 @@ class _SignInFormState extends ConsumerState<SignInForm> {
 
   @override
   void dispose() {
-    super.dispose();
     usernameEmailController.dispose();
     passwordController.dispose();
+    super.dispose();
   }
 
   Future<void> _handleSignIn() async {
@@ -57,34 +57,27 @@ class _SignInFormState extends ConsumerState<SignInForm> {
           "username_email": usernameEmailController.text,
           "password": passwordController.text,
           "device_name": deviceInfo['name'],
-          "device_type": (Platform.isAndroid) ? "A" : "I",
+          "device_type": Platform.isAndroid ? "A" : "I",
           "device_os_version": deviceInfo['systemVersion'],
         },
       );
 
-      // Always stop loading regardless of response
       setState(() {
         isSubmitLoading = false;
       });
 
       if (response['statusCode'] == 200) {
-        // check if 2FA enabled
         if (response['body']['data']['2FA'] != null) {
-          // navigate to the 2FA screen
           context.router.push(TwoFactorAuthRoute(
             userId: response['body']['data']['user_id'],
             method: response['body']['data']['method'],
           ));
         } else {
-          // save the token in the local storage
           await setSharedPref('x-auth-token', response['body']['data']['token']);
-          // update user provider data
           ref.read(userProvider.notifier).state = response['body']['data']['user'];
-          // navigate to the home screen
           goHome(ref, context: context);
         }
       } else {
-        // Show error message from API
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(
@@ -92,11 +85,9 @@ class _SignInFormState extends ConsumerState<SignInForm> {
           );
       }
     } catch (e) {
-      // Handle any exceptions and stop loading
       setState(() {
         isSubmitLoading = false;
       });
-
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(
@@ -111,7 +102,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
       key: formKey,
       child: Column(
         children: [
-          // Username or Email
+          // Email / Username
           TextFormField(
             controller: usernameEmailController,
             keyboardType: TextInputType.emailAddress,
@@ -130,6 +121,7 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             },
           ),
           const SizedBox(height: 20),
+
           // Password
           TextFormField(
             controller: passwordController,
@@ -141,14 +133,14 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                 child: Icon(Icons.password),
               ),
               suffixIcon: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: IconButton(
                   onPressed: () {
                     setState(() {
                       isPasswordObscure = !isPasswordObscure;
                     });
                   },
-                  icon: Icon((isPasswordObscure) ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(isPasswordObscure ? Icons.visibility : Icons.visibility_off),
                 ),
               ),
             ),
@@ -160,7 +152,8 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             },
           ),
           const SizedBox(height: 10),
-          // Forget Password – keep default blue link style
+
+          // Forgot Password – remains blue link
           TextButton(
             onPressed: () {
               context.router.push(const ForgetPasswordRoute());
@@ -168,7 +161,8 @@ class _SignInFormState extends ConsumerState<SignInForm> {
             child: Text(tr("Forgotten password?")),
           ),
           const SizedBox(height: 10),
-          // Submit – uses splash-screen colors, no arrow
+
+          // Sign In Button – matches splash, loader adapts
           ElevatedButton(
             onPressed: _handleSignIn,
             style: ElevatedButton.styleFrom(
@@ -179,18 +173,23 @@ class _SignInFormState extends ConsumerState<SignInForm> {
                 borderRadius: BorderRadius.circular(30),
               ),
               elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 18),
             ),
             child: isSubmitLoading
-                ? const SizedBox(
+                ? SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(color: Colors.white),
+                    child: CircularProgressIndicator(
+                      color: widget.buttonText, // Adapts to theme!
+                      strokeWidth: 2,
+                    ),
                   )
                 : Text(
                     tr("Sign In"),
                     style: TextStyle(
                       color: widget.buttonText,
                       fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
           ),
