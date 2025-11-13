@@ -28,9 +28,8 @@ class SignInScreen extends StatelessWidget {
         ? "assets/images/welcome_logo_light.png"
         : "assets/images/welcome_logo.png";
 
-    // Same colors as the splash screen button
     final buttonBg = isDark ? const Color(0xFFD1D1D1) : const Color(0xFF242527);
-    final buttonText = isDark ? const Color(0xFF000000) : const Color(0xFFD1D1D1);
+    final buttonText = isDark ? const Color(0xFF242527) : const Color(0xFFD1D1D1);
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +83,6 @@ class _Body extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 40),
-            // Title text updated: only "Sign In"
             Text(
               tr("Sign In"),
               textAlign: TextAlign.center,
@@ -95,7 +93,7 @@ class _Body extends ConsumerWidget {
             ),
             const SizedBox(height: 60),
 
-            // Sign in form – now receives the theme colors
+            // Pass theme colors to SignInForm
             SignInForm(buttonBg: buttonBg, buttonText: buttonText),
 
             // Social login section
@@ -107,79 +105,67 @@ class _Body extends ConsumerWidget {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Facebook login
                           if (isTrue($system['facebook_login_enabled']))
                             Column(
                               children: [
                                 SocialLoginButton(
                                   text: tr('Sign in with Facebook'),
-                                  image:
-                                      'assets/images/icons/social/facebook.svg',
+                                  image: 'assets/images/icons/social/facebook.svg',
                                   onTap: () {},
                                 ),
                                 const SizedBox(height: 15),
                               ],
                             ),
-                          // Google login
                           if (isTrue($system['google_login_enabled']))
                             Column(
                               children: [
                                 SocialLoginButton(
                                   text: tr('Sign in with Google'),
-                                  image:
-                                      'assets/images/icons/social/google.svg',
+                                  image: 'assets/images/icons/social/google.svg',
                                   onTap: () {},
                                 ),
                                 const SizedBox(height: 15),
                               ],
                             ),
-                          // Twitter login
                           if (isTrue($system['twitter_login_enabled']))
                             Column(
                               children: [
                                 SocialLoginButton(
                                   text: tr('Sign in with X'),
-                                  image:
-                                      'assets/images/icons/social/twitter.svg',
+                                  image: 'assets/images/icons/social/twitter.svg',
                                   onTap: () {},
                                 ),
                                 const SizedBox(height: 15),
                               ],
                             ),
-                          // LinkedIn login
                           if (isTrue($system['linkedin_login_enabled']))
                             Column(
                               children: [
                                 SocialLoginButton(
                                   text: tr('Sign in with LinkedIn'),
-                                  image:
-                                      'assets/images/icons/social/linkedin.svg',
+                                  image: 'assets/images/icons/social/linkedin.svg',
                                   onTap: () {},
                                 ),
                                 const SizedBox(height: 15),
                               ],
                             ),
-                          // VK login
                           if (isTrue($system['vk_login_enabled']))
                             Column(
                               children: [
                                 SocialLoginButton(
                                   text: tr('Sign in with VK'),
-                                  image:
-                                      'assets/images/icons/social/vk.svg',
+                                  image: 'assets/images/icons/social/vk.svg',
                                   onTap: () {},
                                 ),
                                 const SizedBox(height: 15),
                               ],
                             ),
-                          // WordPress login
                           if (isTrue($system['wordpress_login_enabled']))
                             Column(
                               children: [
                                 SocialLoginButton(
                                   text: tr('Sign in with WordPress'),
-                                  image:
-                                      'assets/images/icons/social/wordpress.svg',
+                                  image: 'assets/images/icons/social/wordpress.svg',
                                   onTap: () {},
                                 ),
                                 const SizedBox(height: 15),
@@ -193,7 +179,6 @@ class _Body extends ConsumerWidget {
 
             const SizedBox(height: 20),
 
-            // Sign up prompt – keep the link blue (default TextButton color)
             if (isTrue($system['registration_enabled']))
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -205,9 +190,7 @@ class _Body extends ConsumerWidget {
                     },
                     child: Text(
                       tr("Sign Up!"),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
